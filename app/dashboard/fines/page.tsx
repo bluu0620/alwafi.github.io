@@ -1,7 +1,8 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { addFineAction, FINE_REASONS, type Fine } from "./actions";
+import { addFineAction } from "./actions";
+import { FINE_REASONS, type Fine } from "./types";
 import { LEVELS } from "@/lib/program-data";
 
 export default async function FinesPage() {

@@ -4,21 +4,7 @@ import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { logAuditEvent } from "@/lib/audit-log";
-
-export type Fine = {
-  id: string;
-  reason: "phone" | "language" | "other";
-  otherNote?: string;
-  issuedByName: string;
-  issuedById: string;
-  issuedAt: string;
-};
-
-export const FINE_REASONS: Record<string, string> = {
-  phone: "استخدام الجوال ",
-  language: "التحدث بغير العربية",
-  other: "أخرى",
-};
+import { type Fine, FINE_REASONS } from "./types";
 
 async function requireIssuable() {
   const user = await currentUser();

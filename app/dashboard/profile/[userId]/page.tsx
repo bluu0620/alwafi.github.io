@@ -1,7 +1,8 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { LEVELS } from "@/lib/program-data";
-import { addFineAction, removeFineAction, FINE_REASONS, type Fine } from "@/app/dashboard/fines/actions";
+import { addFineAction, removeFineAction } from "@/app/dashboard/fines/actions";
+import { FINE_REASONS, type Fine } from "@/app/dashboard/fines/types";
 import Link from "next/link";
 
 const ROLE_LABELS: Record<string, string> = {
