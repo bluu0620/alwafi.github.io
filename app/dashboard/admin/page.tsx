@@ -167,6 +167,7 @@ export default async function AdminDashboard() {
                         {!isSelf && (isDev || (role !== "admin" && role !== "dev")) ? (
                           <RoleSelect
                             currentRole={role}
+                            isDev={isDev}
                             action={async (formData: FormData) => {
                               "use server";
                               const newRole = formData.get("combined") as string;

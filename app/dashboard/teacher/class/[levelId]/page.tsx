@@ -50,7 +50,7 @@ export default async function TeacherClassPage({
   if (!user) redirect("/");
 
   const role = user.unsafeMetadata?.role as string | undefined;
-  if (role !== "teacher" && role !== "admin") redirect("/dashboard");
+  if (role !== "teacher" && role !== "admin" && role !== "dev") redirect("/dashboard");
 
   const { levelId } = await params;
   if (!LEVELS[levelId]) notFound();

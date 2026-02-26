@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 
-const ROLES = [
+const ALL_ROLES = [
   { value: "student",  label: "طالب",  color: "border-purple-500/50 text-purple-300 bg-purple-900/40" },
   { value: "teacher",  label: "معلم",  color: "border-amber-500/50 text-amber-400 bg-amber-500/10" },
   { value: "graduate", label: "خريج",  color: "border-green-500/50 text-green-400 bg-green-500/10" },
@@ -13,13 +13,16 @@ const ROLES = [
 export function RoleSelect({
   currentRole,
   action,
+  isDev = false,
 }: {
   currentRole: string;
   action: (fd: FormData) => Promise<void>;
+  isDev?: boolean;
 }) {
   const [selected, setSelected] = useState(currentRole || "student");
   const formRef = useRef<HTMLFormElement>(null);
-  const roleData = ROLES.find((r) => r.value === selected) ?? ROLES[0];
+  const ROLES = isDev ? ALL_ROLES : ALL_ROLES.filter((r) => r.value !== "admin" && r.value !== "dev");
+  const roleData = ALL_ROLES.find((r) => r.value === selected) ?? ALL_ROLES[0];
 
   return (
     <form ref={formRef} action={action}>
