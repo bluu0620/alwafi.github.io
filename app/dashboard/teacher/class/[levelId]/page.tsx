@@ -4,6 +4,8 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { LEVELS } from "@/lib/program-data";
 import { type HomeworkData, type Submission } from "@/lib/homework-types";
+import { getAnnouncements } from "@/lib/announcements";
+import { postAnnouncement, deleteAnnouncement } from "@/app/dashboard/homework/announcement-actions";
 
 function formatBytes(bytes: number) {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
@@ -62,6 +64,17 @@ export default async function TeacherClassPage({
     if (deptMap[dept ?? ""] !== levelData.department) redirect("/dashboard/teacher");
   }
 
+  // Filter subjects by teacher department (language → arabic subjects only, sharia → islamic)
+  const subjects =
+    role === "admin"
+      ? levelData.subjects
+      : dept === "language"
+      ? levelData.subjects.filter((s) => levelData.department === "arabic")
+      : levelData.subjects.filter((s) => levelData.department === "islamic");
+  // Since levels are already department-specific, this effectively shows all subjects
+  // for the level, but makes the intent explicit and future-proof.
+  const displaySubjects = subjects.length > 0 ? subjects : levelData.subjects;
+
   const client = await clerkClient();
   const { data: allUsers } = await client.users.getUserList({ limit: 200 });
 
@@ -73,7 +86,11 @@ export default async function TeacherClassPage({
   );
 
   const { subject: activeSubject } = await searchParams;
-  const subject = activeSubject ?? levelData.subjects[0]?.name ?? "";
+  const subject = activeSubject ?? displaySubjects[0]?.name ?? "";
+
+  // Load announcements for this level
+  const announcements = await getAnnouncements(levelId);
+  const subjectAnnouncements = announcements[subject] ?? [];
 
   return (
     <div className="min-h-[calc(100vh-80px)] p-6">
@@ -104,11 +121,12 @@ export default async function TeacherClassPage({
               المواد
             </p>
             <div className="space-y-1">
-              {levelData.subjects.map((s) => {
+              {displaySubjects.map((s) => {
                 const totalSubmissions = students.reduce((acc, st) => {
                   const hw = (st.unsafeMetadata?.homework as HomeworkData) ?? {};
                   return acc + (hw[s.name]?.length ?? 0);
                 }, 0);
+                const hasAnnouncement = (announcements[s.name]?.length ?? 0) > 0;
                 const isActive = s.name === subject;
                 return (
                   <Link
@@ -123,6 +141,9 @@ export default async function TeacherClassPage({
                     <span className="flex items-center gap-2">
                       <span>{s.icon}</span>
                       <span className="font-medium">{s.name}</span>
+                      {hasAnnouncement && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                      )}
                     </span>
                     {totalSubmissions > 0 && (
                       <span className="text-xs px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-400 font-bold">
@@ -135,15 +156,71 @@ export default async function TeacherClassPage({
             </div>
           </div>
 
-          {/* Student submissions for selected subject */}
-          <div>
-            <div className="flex items-center gap-3 mb-5">
+          {/* Right panel */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
               <span className="text-2xl">
-                {levelData.subjects.find((s) => s.name === subject)?.icon}
+                {displaySubjects.find((s) => s.name === subject)?.icon}
               </span>
               <h2 className="text-xl font-bold text-white">{subject}</h2>
             </div>
 
+            {/* Announcements section */}
+            <div className="bg-amber-900/10 rounded-2xl border border-amber-500/20 p-5">
+              <p className="text-sm font-bold text-amber-400 mb-4 flex items-center gap-2">
+                📢 إعلانات المادة
+              </p>
+
+              {/* Existing announcements */}
+              {subjectAnnouncements.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {subjectAnnouncements.map((ann) => (
+                    <div
+                      key={ann.id}
+                      className="flex items-start gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white leading-relaxed">{ann.text}</p>
+                        <p className="text-xs text-purple-300/40 mt-1">
+                          {ann.teacherName} · {formatDate(ann.postedAt)}
+                        </p>
+                      </div>
+                      <form action={deleteAnnouncement}>
+                        <input type="hidden" name="levelId" value={levelId} />
+                        <input type="hidden" name="subject" value={subject} />
+                        <input type="hidden" name="announcementId" value={ann.id} />
+                        <button
+                          type="submit"
+                          className="text-xs text-red-500/50 hover:text-red-400 transition shrink-0"
+                        >
+                          حذف
+                        </button>
+                      </form>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Post new announcement */}
+              <form action={postAnnouncement} className="space-y-2">
+                <input type="hidden" name="levelId" value={levelId} />
+                <input type="hidden" name="subject" value={subject} />
+                <textarea
+                  name="text"
+                  placeholder="اكتب إعلاناً للطلاب في هذه المادة..."
+                  rows={2}
+                  className="w-full bg-purple-900/30 border border-purple-700/30 rounded-xl px-4 py-2.5 text-sm text-white placeholder-purple-300/30 focus:outline-none focus:border-amber-500/40 resize-none"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-bold hover:bg-amber-500/30 transition"
+                >
+                  نشر الإعلان
+                </button>
+              </form>
+            </div>
+
+            {/* Student submissions for selected subject */}
             {students.length === 0 ? (
               <div className="text-center py-16 text-purple-300/30">
                 <p className="text-4xl mb-3">👥</p>

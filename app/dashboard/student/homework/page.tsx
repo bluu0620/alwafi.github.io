@@ -3,7 +3,17 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LEVELS } from "@/lib/program-data";
 import { type HomeworkData } from "@/lib/homework-types";
+import { getAnnouncements } from "@/lib/announcements";
 import { SubmitPanel } from "./SubmitPanel";
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("ar-SA", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export default async function StudentHomeworkPage({
   searchParams,
@@ -23,6 +33,10 @@ export default async function StudentHomeworkPage({
   const homework = (user.unsafeMetadata?.homework as HomeworkData) ?? {};
   const { subject: activeSubject } = await searchParams;
   const subject = activeSubject ?? levelData.subjects[0]?.name ?? "";
+
+  // Load announcements for this level
+  const announcements = await getAnnouncements(level);
+  const subjectAnnouncements = announcements[subject] ?? [];
 
   return (
     <div className="min-h-[calc(100vh-80px)] p-6">
@@ -53,6 +67,7 @@ export default async function StudentHomeworkPage({
             <div className="space-y-1">
               {levelData.subjects.map((s) => {
                 const count = homework[s.name]?.length ?? 0;
+                const hasAnnouncement = (announcements[s.name]?.length ?? 0) > 0;
                 const isActive = s.name === subject;
                 return (
                   <Link
@@ -67,6 +82,9 @@ export default async function StudentHomeworkPage({
                     <span className="flex items-center gap-2">
                       <span>{s.icon}</span>
                       <span className="font-medium">{s.name}</span>
+                      {hasAnnouncement && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" title="يوجد إعلان" />
+                      )}
                     </span>
                     {count > 0 && (
                       <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-bold">
@@ -79,7 +97,7 @@ export default async function StudentHomeworkPage({
             </div>
           </div>
 
-          {/* Submit panel for selected subject */}
+          {/* Subject content */}
           <div>
             <div className="flex items-center gap-3 mb-4">
               <span className="text-2xl">
@@ -87,6 +105,27 @@ export default async function StudentHomeworkPage({
               </span>
               <h2 className="text-xl font-bold text-white">{subject}</h2>
             </div>
+
+            {/* Teacher announcements */}
+            {subjectAnnouncements.length > 0 && (
+              <div className="mb-5 bg-amber-900/10 rounded-2xl border border-amber-500/20 p-4 space-y-3">
+                <p className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                  📢 إعلانات المعلم
+                </p>
+                {subjectAnnouncements.map((ann) => (
+                  <div
+                    key={ann.id}
+                    className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/10"
+                  >
+                    <p className="text-sm text-white leading-relaxed">{ann.text}</p>
+                    <p className="text-xs text-purple-300/40 mt-1.5">
+                      {ann.teacherName} · {formatDate(ann.postedAt)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <SubmitPanel
               subject={subject}
               existingSubmissions={homework[subject] ?? []}

@@ -96,9 +96,9 @@ export default async function AdminDashboard() {
                 <tr>
                   <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40 rounded-r-xl">المستخدم</th>
                   <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40">البريد</th>
-                  <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">تاريخ الإنشاء</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">الدور</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">القسم / المستوى</th>
+                  <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">تاريخ الإنشاء</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40 rounded-l-xl">الإجراءات</th>
                 </tr>
               </thead>
@@ -149,17 +149,10 @@ export default async function AdminDashboard() {
                         {role !== "admin" ? (
                           <RoleSelect
                             currentRole={role}
-                            currentDepartment={department}
                             action={async (formData: FormData) => {
                               "use server";
-                              const combined = formData.get("combined") as string;
-                              const [newRole, newDept] = combined.includes(":")
-                                ? combined.split(":")
-                                : [combined, ""];
+                              const newRole = formData.get("combined") as string;
                               await updateUserRole(u.id, newRole);
-                              if (newRole === "teacher") {
-                                await updateTeacherDepartment(u.id, newDept);
-                              }
                             }}
                           />
                         ) : (
@@ -192,7 +185,7 @@ export default async function AdminDashboard() {
                                 const newDept = formData.get("department") as string;
                                 await updateTeacherDepartment(u.id, newDept);
                               }}
-                              className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-full px-3 text-center focus:outline-none focus:border-amber-500/50"
+                              className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-full px-3 pr-7 text-center focus:outline-none focus:border-amber-500/50"
                             >
                               <option value="">— بدون قسم —</option>
                               <option value="language">لغوي</option>
@@ -216,7 +209,7 @@ export default async function AdminDashboard() {
                                 const newLevel = formData.get("level") as string;
                                 await updateStudentLevel(u.id, newLevel);
                               }}
-                              className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-full px-3 text-center focus:outline-none focus:border-amber-500/50 max-w-[120px]"
+                              className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-full px-3 pr-7 text-center focus:outline-none focus:border-amber-500/50 max-w-[120px]"
                             >
                               <option value="">— بدون مستوى —</option>
                               <optgroup label="قسم اللغة العربية">
