@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { updateUserRole, deleteUser, updateStudentLevel } from "./actions";
 import { LEVELS, ARABIC_LEVELS, ISLAMIC_LEVELS } from "@/lib/program-data";
+import { getLevelsConfig, getAllMergedLevels } from "@/lib/level-config";
 import { type AuditEntry } from "@/lib/audit-log";
 import { RoleSelect } from "./RoleSelect";
 import { AutoSaveSelect } from "./AutoSaveSelect";
@@ -30,6 +31,8 @@ export default async function AdminDashboard() {
 
   const client = await clerkClient();
   const { data: users } = await client.users.getUserList({ limit: 100 });
+  const levelsConfig = await getLevelsConfig();
+  const mergedLevels = getAllMergedLevels(levelsConfig);
 
   // Aggregate in-site audit log from all users' metadata
   const auditLog: AuditEntry[] = [];
@@ -270,29 +273,60 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {/* Level Overview */}
+        {/* Level Manager */}
         <div className="mt-8 bg-purple-900/20 rounded-2xl border border-amber-500/10 p-6">
           <h2 className="text-xl font-bold text-amber-400 mb-6 flex items-center gap-3">
             <span className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">📊</span>
-            توزيع الطلاب على المستويات
+            إدارة المستويات
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            {Object.values(LEVELS).map((lvl) => {
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {Object.values(mergedLevels).map((lvl) => {
               const count = users.filter(
                 (u) => u.unsafeMetadata?.level === lvl.id
               ).length;
+              const isCustomized = !!levelsConfig[lvl.id];
               return (
-                <Link
+                <div
                   key={lvl.id}
-                  href={`/dashboard/admin/preview/${lvl.id}`}
-                  className="bg-purple-900/30 rounded-xl p-4 border border-purple-800/30 text-center hover:border-amber-500/30 hover:bg-purple-900/50 transition-colors"
+                  className="bg-purple-900/30 rounded-xl p-4 border border-purple-800/30 hover:border-purple-700/50 transition-colors"
                 >
-                  <p className="text-2xl font-bold text-amber-400">{count}</p>
-                  <p className="text-sm text-white font-medium mt-1">{lvl.name}</p>
-                  <p className="text-xs text-purple-300/50 mt-0.5">
-                    {lvl.department === "arabic" ? "لغوي" : "شرعي"}
-                  </p>
-                </Link>
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <div>
+                      <p className="text-sm font-bold text-white leading-snug">{lvl.name}</p>
+                      {lvl.leader && (
+                        <p className="text-xs text-purple-300/40 mt-0.5">{lvl.leader}</p>
+                      )}
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-xl font-bold text-amber-400">{count}</p>
+                      <p className="text-[10px] text-purple-300/40">طالب</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] text-purple-300/30">
+                      {lvl.subjects.length} مواد
+                    </span>
+                    {isCustomized && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                        معدّل
+                      </span>
+                    )}
+                    <div className="mr-auto flex gap-1.5">
+                      <Link
+                        href={`/dashboard/admin/preview/${lvl.id}`}
+                        className="px-2.5 py-1 rounded-lg bg-purple-800/40 border border-purple-700/30 text-purple-300 text-xs hover:bg-purple-800/60 transition"
+                      >
+                        عرض
+                      </Link>
+                      <Link
+                        href={`/dashboard/admin/levels/${lvl.id}`}
+                        className="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/25 transition"
+                      >
+                        تعديل
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               );
             })}
           </div>

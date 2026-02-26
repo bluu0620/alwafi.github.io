@@ -3,6 +3,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { LEVELS } from "@/lib/program-data";
+import { getLevelsConfig, mergeLevel } from "@/lib/level-config";
 import { type HomeworkData, type Submission } from "@/lib/homework-types";
 import { getAnnouncements } from "@/lib/announcements";
 import { postAnnouncement, deleteAnnouncement } from "@/app/dashboard/homework/announcement-actions";
@@ -52,8 +53,9 @@ export default async function TeacherClassPage({
   if (role !== "teacher" && role !== "admin") redirect("/dashboard");
 
   const { levelId } = await params;
-  const levelData = LEVELS[levelId];
-  if (!levelData) notFound();
+  if (!LEVELS[levelId]) notFound();
+  const levelsConfig = await getLevelsConfig();
+  const levelData = mergeLevel(levelId, levelsConfig);
 
   // Teacher's chosen visible subjects for this level (empty = show all)
   const teacherSubjects = (user.unsafeMetadata?.teacherSubjects as Record<string, string[]> | undefined) ?? {};

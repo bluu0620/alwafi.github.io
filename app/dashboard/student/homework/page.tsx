@@ -2,6 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LEVELS } from "@/lib/program-data";
+import { getLevelsConfig, mergeLevel } from "@/lib/level-config";
 import { type HomeworkData } from "@/lib/homework-types";
 import { getAnnouncements } from "@/lib/announcements";
 import { SubmitPanel } from "./SubmitPanel";
@@ -27,8 +28,9 @@ export default async function StudentHomeworkPage({
   const level = user.unsafeMetadata?.level as string | undefined;
   if (role !== "student" || !level) redirect("/dashboard");
 
-  const levelData = LEVELS[level];
-  if (!levelData) redirect("/dashboard");
+  if (!LEVELS[level]) redirect("/dashboard");
+  const levelsConfig = await getLevelsConfig();
+  const levelData = mergeLevel(level, levelsConfig);
 
   const homework = (user.unsafeMetadata?.homework as HomeworkData) ?? {};
   const { subject: activeSubject } = await searchParams;
