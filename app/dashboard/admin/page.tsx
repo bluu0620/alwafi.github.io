@@ -295,7 +295,7 @@ export default async function AdminDashboard() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {Object.values(mergedLevels).map((lvl) => {
               const count = users.filter(
-                (u) => u.unsafeMetadata?.level === lvl.id
+                (u) => u.unsafeMetadata?.role === "student" && u.unsafeMetadata?.level === lvl.id
               ).length;
               const isCustomized = !!levelsConfig[lvl.id];
               return (

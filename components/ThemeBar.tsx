@@ -3,12 +3,12 @@
 import { useTheme, type ThemeName } from "./ThemeProvider";
 
 const THEMES: { id: ThemeName; label: string; color: string }[] = [
-  { id: "solar",  label: "شمسي",   color: "#268BD2" },
-  { id: "earth",  label: "طيني",   color: "#C0652A" },
-  { id: "arctic", label: "قطبي",   color: "#00B4D8" },
-  { id: "neon",   label: "نيون",   color: "#FF007F" },
-  { id: "pastel", label: "باستيل", color: "#D080C8" },
-  { id: "mono",   label: "كلاسيك", color: "#888888" },
+  { id: "library",   label: "مكتبة",  color: "#4F81C7" },
+  { id: "science",   label: "علوم",   color: "#2EC4B6" },
+  { id: "campus",    label: "حرم",    color: "#84A98C" },
+  { id: "authority", label: "رصين",   color: "#B08968" },
+  { id: "stem",      label: "تقني",   color: "#5BC0BE" },
+  { id: "mono",      label: "أحادي",  color: "#888888" },
 ];
 
 export function ThemeBar() {

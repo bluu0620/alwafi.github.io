@@ -18,170 +18,176 @@ interface ThemeVars {
 }
 
 const THEMES: Record<ThemeName, Record<ThemeMode, ThemeVars>> = {
-  solar: {
+  // ── LIBRARY CLASSIC ────────────────────────────────────────────────────────
+  library: {
     dark: {
-      "--bg-page":       "#002B36",
-      "--bg-card":       "#0A3F50",   // clearly lighter teal
-      "--bg-card-2":     "#104F64",   // even lighter
-      "--accent":        "#268BD2",
-      "--accent-2":      "#2AA198",
-      "--cta":           "#CB4B16",
-      "--cta-text":      "#FDF6E3",
-      "--text":          "#93A1A1",
-      "--text-bright":   "#EEE8D5",
-      "--text-muted":    "#4F6369",
-      "--border":        "rgba(38,139,210,0.14)",
-      "--border-accent": "rgba(38,139,210,0.38)",
-    },
-    light: {
-      "--bg-page":       "#FDF6E3",
-      "--bg-card":       "#E9DFB8",   // clearly darker cream
-      "--bg-card-2":     "#D9CE98",   // even darker
-      "--accent":        "#1A6FAA",
-      "--accent-2":      "#2AA198",
-      "--cta":           "#B58900",
-      "--cta-text":      "#FFFFFF",
-      "--text":          "#536970",
-      "--text-bright":   "#073642",
-      "--text-muted":    "#93A1A1",
-      "--border":        "rgba(38,139,210,0.18)",
-      "--border-accent": "rgba(38,139,210,0.42)",
-    },
-  },
-
-  earth: {
-    dark: {
-      "--bg-page":       "#2F2A25",
-      "--bg-card":       "#443D35",   // clearly lighter brown
-      "--bg-card-2":     "#534B40",   // even lighter
-      "--accent":        "#B89A6A",   // warm tan (readable on dark bg)
-      "--accent-2":      "#7DA44A",   // olive-green secondary
-      "--cta":           "#C0652A",
-      "--cta-text":      "#FFF8F0",
-      "--text":          "#C8B99C",
-      "--text-bright":   "#F5F1E8",
-      "--text-muted":    "#7D6F60",
-      "--border":        "rgba(184,154,106,0.14)",
-      "--border-accent": "rgba(184,154,106,0.38)",
-    },
-    light: {
-      "--bg-page":       "#F5F1E8",
-      "--bg-card":       "#DCCFB4",   // clearly darker
-      "--bg-card-2":     "#C9BA9A",   // even darker
-      "--accent":        "#5C6B00",   // dark olive
-      "--accent-2":      "#7A4520",
-      "--cta":           "#A0522D",
-      "--cta-text":      "#FFFFFF",
-      "--text":          "#4A3728",
-      "--text-bright":   "#2A1A0A",
-      "--text-muted":    "#7D6B5A",
-      "--border":        "rgba(92,107,0,0.18)",
-      "--border-accent": "rgba(92,107,0,0.42)",
-    },
-  },
-
-  arctic: {
-    dark: {
-      "--bg-page":       "#0A1F2E",
-      "--bg-card":       "#0D3048",   // clearly lighter navy
-      "--bg-card-2":     "#124060",   // even lighter
-      "--accent":        "#00B4D8",
-      "--accent-2":      "#0077B6",
-      "--cta":           "#90E0EF",
-      "--cta-text":      "#012050",
-      "--text":          "#ADE8F4",
-      "--text-bright":   "#CAF0F8",
-      "--text-muted":    "#4090A8",
-      "--border":        "rgba(0,180,216,0.14)",
-      "--border-accent": "rgba(0,180,216,0.38)",
-    },
-    light: {
-      "--bg-page":       "#EAF6FF",
-      "--bg-card":       "#BEDFF8",   // clearly darker blue-white
-      "--bg-card-2":     "#9ACCED",   // even darker
-      "--accent":        "#005B8A",
-      "--accent-2":      "#00B4D8",
-      "--cta":           "#013A80",
-      "--cta-text":      "#FFFFFF",
-      "--text":          "#014060",
-      "--text-bright":   "#012050",
-      "--text-muted":    "#3A8AAA",
-      "--border":        "rgba(0,91,138,0.18)",
-      "--border-accent": "rgba(0,91,138,0.42)",
-    },
-  },
-
-  neon: {
-    dark: {
-      "--bg-page":       "#0D0D0D",
-      "--bg-card":       "#1C0A1C",   // clearly lighter dark purple
-      "--bg-card-2":     "#2A1030",   // even lighter
-      "--accent":        "#FF007F",
-      "--accent-2":      "#BF00FF",
-      "--cta":           "#00F5FF",
-      "--cta-text":      "#0D0D0D",
-      "--text":          "#F0F0F0",
-      "--text-bright":   "#FFFFFF",
-      "--text-muted":    "#808080",
-      "--border":        "rgba(255,0,127,0.14)",
-      "--border-accent": "rgba(255,0,127,0.38)",
+      "--bg-page":       "#1C1F24",
+      "--bg-card":       "#252A32",
+      "--bg-card-2":     "#2E3440",
+      "--accent":        "#4F81C7",   // steel blue
+      "--accent-2":      "#C2A878",   // warm tan
+      "--cta":           "#C2A878",
+      "--cta-text":      "#1C1F24",
+      "--text":          "#A8A29A",
+      "--text-bright":   "#E6E1D9",
+      "--text-muted":    "#6B6560",
+      "--border":        "rgba(79,129,199,0.14)",
+      "--border-accent": "rgba(79,129,199,0.38)",
     },
     light: {
       "--bg-page":       "#FFFFFF",
-      "--bg-card":       "#F0DEFF",   // clearly distinct purple-tint
-      "--bg-card-2":     "#E5CCFF",   // even more distinct
-      "--accent":        "#BB0060",
-      "--accent-2":      "#9900CC",
-      "--cta":           "#0099AA",
+      "--bg-card":       "#EDE8DF",
+      "--bg-card-2":     "#DDD6C8",
+      "--accent":        "#1E3A5F",   // deep navy blue
+      "--accent-2":      "#7A5C3E",   // warm brown
+      "--cta":           "#7A5C3E",
       "--cta-text":      "#FFFFFF",
-      "--text":          "#2D1030",
-      "--text-bright":   "#120018",
-      "--text-muted":    "#60506A",
-      "--border":        "rgba(187,0,96,0.18)",
-      "--border-accent": "rgba(187,0,96,0.42)",
+      "--text":          "#3A3530",
+      "--text-bright":   "#1A1512",
+      "--text-muted":    "#7A7265",
+      "--border":        "rgba(30,58,95,0.15)",
+      "--border-accent": "rgba(30,58,95,0.40)",
     },
   },
 
-  pastel: {
+  // ── SCIENCE LAB ────────────────────────────────────────────────────────────
+  science: {
     dark: {
-      "--bg-page":       "#1E1E2E",
-      "--bg-card":       "#2C2B44",   // clearly lighter
-      "--bg-card-2":     "#3A3858",   // even lighter
-      "--accent":        "#D080C8",   // lighter mauve (readable on dark)
-      "--accent-2":      "#7EC8C8",   // teal-mint secondary
-      "--cta":           "#D4477B",
-      "--cta-text":      "#FFF0F8",
-      "--text":          "#E0D0F0",
-      "--text-bright":   "#F5EEFF",
-      "--text-muted":    "#8878A8",
-      "--border":        "rgba(208,128,200,0.14)",
-      "--border-accent": "rgba(208,128,200,0.38)",
+      "--bg-page":       "#182028",
+      "--bg-card":       "#1F2C36",
+      "--bg-card-2":     "#263845",
+      "--accent":        "#2EC4B6",   // teal
+      "--accent-2":      "#90E0EF",   // light cyan
+      "--cta":           "#2EC4B6",
+      "--cta-text":      "#0F2027",
+      "--text":          "#8EC8CC",
+      "--text-bright":   "#E0FBFC",
+      "--text-muted":    "#4A7880",
+      "--border":        "rgba(46,196,182,0.14)",
+      "--border-accent": "rgba(46,196,182,0.38)",
     },
     light: {
-      "--bg-page":       "#FFE5D9",
-      "--bg-card":       "#F5CBBA",   // clearly darker peach
-      "--bg-card-2":     "#EAB5A0",   // even darker
-      "--accent":        "#8A2A78",
-      "--accent-2":      "#2A8A88",
-      "--cta":           "#C43570",
+      "--bg-page":       "#FFFFFF",
+      "--bg-card":       "#E2EEF0",
+      "--bg-card-2":     "#C8E0E4",
+      "--accent":        "#006D77",   // deep teal
+      "--accent-2":      "#008B8B",
+      "--cta":           "#006D77",
       "--cta-text":      "#FFFFFF",
-      "--text":          "#5A4560",
-      "--text-bright":   "#3D2850",
-      "--text-muted":    "#8A7898",
-      "--border":        "rgba(138,42,120,0.18)",
-      "--border-accent": "rgba(138,42,120,0.42)",
+      "--text":          "#1B2830",
+      "--text-bright":   "#0A1218",
+      "--text-muted":    "#3A7880",
+      "--border":        "rgba(0,109,119,0.15)",
+      "--border-accent": "rgba(0,109,119,0.42)",
     },
   },
 
+  // ── CAMPUS MODERN ──────────────────────────────────────────────────────────
+  campus: {
+    dark: {
+      "--bg-page":       "#17191D",
+      "--bg-card":       "#1E2530",
+      "--bg-card-2":     "#252E38",
+      "--accent":        "#84A98C",   // sage green
+      "--accent-2":      "#52796F",   // muted teal
+      "--cta":           "#84A98C",
+      "--cta-text":      "#121417",
+      "--text":          "#9EB0A8",
+      "--text-bright":   "#DCE1E3",
+      "--text-muted":    "#4A5860",
+      "--border":        "rgba(132,169,140,0.14)",
+      "--border-accent": "rgba(132,169,140,0.38)",
+    },
+    light: {
+      "--bg-page":       "#FFFFFF",
+      "--bg-card":       "#E5EBE8",
+      "--bg-card-2":     "#D2DCD8",
+      "--accent":        "#2F3E46",   // slate teal
+      "--accent-2":      "#3A5A40",   // forest green
+      "--cta":           "#3A5A40",
+      "--cta-text":      "#FFFFFF",
+      "--text":          "#252C2A",
+      "--text-bright":   "#111918",
+      "--text-muted":    "#5A6868",
+      "--border":        "rgba(47,62,70,0.15)",
+      "--border-accent": "rgba(47,62,70,0.40)",
+    },
+  },
+
+  // ── ACADEMIC AUTHORITY ─────────────────────────────────────────────────────
+  authority: {
+    dark: {
+      "--bg-page":       "#1C1914",
+      "--bg-card":       "#262018",
+      "--bg-card-2":     "#302820",
+      "--accent":        "#B08968",   // warm tan
+      "--accent-2":      "#E6CCB2",   // parchment
+      "--cta":           "#B08968",
+      "--cta-text":      "#1B1410",
+      "--text":          "#C4AA90",
+      "--text-bright":   "#F5EBE0",
+      "--text-muted":    "#7A6550",
+      "--border":        "rgba(176,137,104,0.14)",
+      "--border-accent": "rgba(176,137,104,0.38)",
+    },
+    light: {
+      "--bg-page":       "#FFFFFF",
+      "--bg-card":       "#EDE3D5",
+      "--bg-card-2":     "#DDD0BE",
+      "--accent":        "#5E3023",   // dark auburn
+      "--accent-2":      "#9C6644",   // warm brown
+      "--cta":           "#9C6644",
+      "--cta-text":      "#FFFFFF",
+      "--text":          "#2A1A13",
+      "--text-bright":   "#180A06",
+      "--text-muted":    "#7A6558",
+      "--border":        "rgba(94,48,35,0.15)",
+      "--border-accent": "rgba(94,48,35,0.40)",
+    },
+  },
+
+  // ── STEM FOCUS ─────────────────────────────────────────────────────────────
+  stem: {
+    dark: {
+      "--bg-page":       "#141A2C",
+      "--bg-card":       "#1C2440",
+      "--bg-card-2":     "#232D50",
+      "--accent":        "#5BC0BE",   // cyan-teal
+      "--accent-2":      "#C5E5E8",   // ice blue
+      "--cta":           "#5BC0BE",
+      "--cta-text":      "#0B132B",
+      "--text":          "#9ABCD0",
+      "--text-bright":   "#EAF4F4",
+      "--text-muted":    "#485A78",
+      "--border":        "rgba(91,192,190,0.14)",
+      "--border-accent": "rgba(91,192,190,0.38)",
+    },
+    light: {
+      "--bg-page":       "#FFFFFF",
+      "--bg-card":       "#E2EAF2",
+      "--bg-card-2":     "#CDD9E8",
+      "--accent":        "#003049",   // deep navy
+      "--accent-2":      "#669BBC",   // steel blue
+      "--cta":           "#003049",
+      "--cta-text":      "#FFFFFF",
+      "--text":          "#111827",
+      "--text-bright":   "#060912",
+      "--text-muted":    "#4A6880",
+      "--border":        "rgba(0,48,73,0.15)",
+      "--border-accent": "rgba(0,48,73,0.40)",
+    },
+  },
+
+  // ── MONO ───────────────────────────────────────────────────────────────────
   mono: {
     dark: {
-      "--bg-page":       "#131313",
-      "--bg-card":       "#202020",   // clearly lighter
-      "--bg-card-2":     "#2E2E2E",   // even lighter
+      "--bg-page":       "#1A1A1A",
+      "--bg-card":       "#252525",
+      "--bg-card-2":     "#333333",
       "--accent":        "#C8C8C8",
       "--accent-2":      "#909090",
       "--cta":           "#E8E8E8",
-      "--cta-text":      "#131313",
+      "--cta-text":      "#1A1A1A",
       "--text":          "#B0B0B0",
       "--text-bright":   "#F0F0F0",
       "--text-muted":    "#606060",
@@ -189,13 +195,13 @@ const THEMES: Record<ThemeName, Record<ThemeMode, ThemeVars>> = {
       "--border-accent": "rgba(255,255,255,0.20)",
     },
     light: {
-      "--bg-page":       "#F5F5F5",
-      "--bg-card":       "#E3E3E3",   // clearly darker
-      "--bg-card-2":     "#D0D0D0",   // even darker
+      "--bg-page":       "#FFFFFF",
+      "--bg-card":       "#E8E8E8",
+      "--bg-card-2":     "#D5D5D5",
       "--accent":        "#303030",
       "--accent-2":      "#585858",
       "--cta":           "#1A1A1A",
-      "--cta-text":      "#F5F5F5",
+      "--cta-text":      "#FFFFFF",
       "--text":          "#444444",
       "--text-bright":   "#1A1A1A",
       "--text-muted":    "#808080",
@@ -207,7 +213,7 @@ const THEMES: Record<ThemeName, Record<ThemeMode, ThemeVars>> = {
 
 export function ThemeWrapper({ children }: { children: React.ReactNode }) {
   const { theme, mode } = useTheme();
-  const vars = THEMES[theme]?.[mode] ?? THEMES.solar.dark;
+  const vars = THEMES[theme]?.[mode] ?? THEMES.library.dark;
 
   return (
     <div

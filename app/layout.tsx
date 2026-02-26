@@ -33,7 +33,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const initialTheme = (cookieStore.get("wafi-theme")?.value ?? "solar") as ThemeName;
+  const initialTheme = (cookieStore.get("wafi-theme")?.value ?? "library") as ThemeName;
   const initialMode = (cookieStore.get("wafi-mode")?.value ?? "dark") as ThemeMode;
 
   return (
