@@ -95,9 +95,9 @@ export default async function AdminDashboard() {
                 <tr>
                   <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40 rounded-r-xl">المستخدم</th>
                   <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40">البريد</th>
+                  <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">تاريخ الإنشاء</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">الدور</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">القسم / المستوى</th>
-                  <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">تاريخ الإنشاء</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40 rounded-l-xl">الإجراءات</th>
                 </tr>
               </thead>
@@ -143,15 +143,29 @@ export default async function AdminDashboard() {
                         {email}
                       </td>
 
-                      {/* Role Badge */}
+                      {/* Role — dropdown or badge for admin */}
                       <td className="p-4 text-center">
-                        <span
-                          className={`inline-block px-3 py-1 rounded-full border text-xs font-bold ${
-                            ROLE_COLORS[role] || "bg-purple-900/40 border-purple-700 text-purple-400"
-                          }`}
-                        >
-                          {ROLE_LABELS[role] || "غير محدد"}
-                        </span>
+                        {role !== "admin" ? (
+                          <RoleSelect
+                            currentRole={role}
+                            currentDepartment={department}
+                            action={async (formData: FormData) => {
+                              "use server";
+                              const combined = formData.get("combined") as string;
+                              const [newRole, newDept] = combined.includes(":")
+                                ? combined.split(":")
+                                : [combined, ""];
+                              await updateUserRole(u.id, newRole);
+                              if (newRole === "teacher") {
+                                await updateTeacherDepartment(u.id, newDept);
+                              }
+                            }}
+                          />
+                        ) : (
+                          <span className={`inline-block px-3 py-1 rounded-full border text-xs font-bold ${ROLE_COLORS.admin}`}>
+                            مدير
+                          </span>
+                        )}
                       </td>
 
                       {/* Level / Department */}
@@ -252,25 +266,7 @@ export default async function AdminDashboard() {
 
                       {/* Actions */}
                       <td className="p-4">
-                        <div className="flex flex-col items-center gap-2">
-                          {/* Role select — top row */}
-                          {role !== "admin" && (
-                            <RoleSelect
-                              currentRole={role}
-                              currentDepartment={department}
-                              action={async (formData: FormData) => {
-                                "use server";
-                                const newRole = formData.get("role") as string;
-                                const newDept = formData.get("department") as string;
-                                await updateUserRole(u.id, newRole);
-                                if (newRole === "teacher" && newDept) {
-                                  await updateTeacherDepartment(u.id, newDept);
-                                }
-                              }}
-                            />
-                          )}
-                          {/* Action buttons — bottom row */}
-                          <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                        <div className="flex items-center gap-1.5 flex-wrap justify-center">
                           <Link
                             href={`/dashboard/profile/${u.id}`}
                             className="h-7 px-2.5 flex items-center rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-500/30 transition"
@@ -316,7 +312,6 @@ export default async function AdminDashboard() {
                               </button>
                             </form>
                           )}
-                          </div>
                         </div>
                       </td>
                     </tr>
