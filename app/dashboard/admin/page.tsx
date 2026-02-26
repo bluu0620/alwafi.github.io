@@ -275,7 +275,7 @@ export default async function AdminDashboard() {
                   <p className="text-2xl font-bold text-amber-400">{count}</p>
                   <p className="text-sm text-white font-medium mt-1">{lvl.name}</p>
                   <p className="text-xs text-purple-300/50 mt-0.5">
-                    {lvl.department === "arabic" ? "عربي" : "شرعي"}
+                    {lvl.department === "arabic" ? "لغوي" : "شرعي"}
                   </p>
                 </Link>
               );
