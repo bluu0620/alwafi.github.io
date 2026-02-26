@@ -5,6 +5,7 @@ import { updateUserRole, deleteUser, updateStudentLevel, updateTeacherDepartment
 import { LEVELS, ARABIC_LEVELS, ISLAMIC_LEVELS } from "@/lib/program-data";
 import { type AuditEntry } from "@/lib/audit-log";
 import { RoleSelect } from "./RoleSelect";
+import { AutoSaveSelect } from "./AutoSaveSelect";
 
 const ROLE_LABELS: Record<string, string> = {
   admin: "مدير",
@@ -183,30 +184,20 @@ export default async function AdminDashboard() {
                             ) : (
                               <span className="text-xs text-purple-300/40">غير محدد</span>
                             )}
-                            <form
+                            <AutoSaveSelect
+                              name="department"
+                              defaultValue={department}
                               action={async (formData: FormData) => {
                                 "use server";
                                 const newDept = formData.get("department") as string;
                                 await updateTeacherDepartment(u.id, newDept);
                               }}
-                              className="flex items-center gap-1"
+                              className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-full px-3 text-center focus:outline-none focus:border-amber-500/50"
                             >
-                              <select
-                                name="department"
-                                defaultValue={department}
-                                className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-lg px-2 focus:outline-none focus:border-amber-500/50"
-                              >
-                                <option value="">— بدون قسم —</option>
-                                <option value="language">لغوي</option>
-                                <option value="sharia">شرعي</option>
-                              </select>
-                              <button
-                                type="submit"
-                                className="h-7 px-2.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
-                              >
-                                حفظ
-                              </button>
-                            </form>
+                              <option value="">— بدون قسم —</option>
+                              <option value="language">لغوي</option>
+                              <option value="sharia">شرعي</option>
+                            </AutoSaveSelect>
                           </div>
                         ) : role === "student" ? (
                           <div className="flex flex-col items-center gap-2">
@@ -217,42 +208,32 @@ export default async function AdminDashboard() {
                             ) : (
                               <span className="text-xs text-purple-300/40">غير محدد</span>
                             )}
-                            <form
+                            <AutoSaveSelect
+                              name="level"
+                              defaultValue={level}
                               action={async (formData: FormData) => {
                                 "use server";
                                 const newLevel = formData.get("level") as string;
                                 await updateStudentLevel(u.id, newLevel);
                               }}
-                              className="flex items-center gap-1"
+                              className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-full px-3 text-center focus:outline-none focus:border-amber-500/50 max-w-[120px]"
                             >
-                              <select
-                                name="level"
-                                defaultValue={level}
-                                className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-lg px-2 focus:outline-none focus:border-amber-500/50 max-w-[120px]"
-                              >
-                                <option value="">— بدون مستوى —</option>
-                                <optgroup label="قسم اللغة العربية">
-                                  {ARABIC_LEVELS.map((lvl) => (
-                                    <option key={lvl.id} value={lvl.id}>
-                                      {lvl.name}
-                                    </option>
-                                  ))}
-                                </optgroup>
-                                <optgroup label="القسم الشرعي">
-                                  {ISLAMIC_LEVELS.map((lvl) => (
-                                    <option key={lvl.id} value={lvl.id}>
-                                      {lvl.name}
-                                    </option>
-                                  ))}
-                                </optgroup>
-                              </select>
-                              <button
-                                type="submit"
-                                className="h-7 px-2.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
-                              >
-                                حفظ
-                              </button>
-                            </form>
+                              <option value="">— بدون مستوى —</option>
+                              <optgroup label="قسم اللغة العربية">
+                                {ARABIC_LEVELS.map((lvl) => (
+                                  <option key={lvl.id} value={lvl.id}>
+                                    {lvl.name}
+                                  </option>
+                                ))}
+                              </optgroup>
+                              <optgroup label="القسم الشرعي">
+                                {ISLAMIC_LEVELS.map((lvl) => (
+                                  <option key={lvl.id} value={lvl.id}>
+                                    {lvl.name}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            </AutoSaveSelect>
                           </div>
                         ) : (
                           <span className="text-xs text-purple-300/30">—</span>
@@ -269,14 +250,14 @@ export default async function AdminDashboard() {
                         <div className="flex items-center gap-1.5 flex-wrap justify-center">
                           <Link
                             href={`/dashboard/profile/${u.id}`}
-                            className="h-7 px-2.5 flex items-center rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-500/30 transition"
+                            className="h-7 px-2.5 flex items-center rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-500/30 transition"
                           >
                             ملف
                           </Link>
                           {role === "student" && level && (
                             <Link
                               href={`/dashboard/admin/preview/${level}`}
-                              className="h-7 px-2.5 flex items-center rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                              className="h-7 px-2.5 flex items-center rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
                             >
                               عرض
                             </Link>
@@ -284,7 +265,7 @@ export default async function AdminDashboard() {
                           {role === "teacher" && (
                             <Link
                               href="/dashboard/teacher"
-                              className="h-7 px-2.5 flex items-center rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                              className="h-7 px-2.5 flex items-center rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
                             >
                               عرض
                             </Link>
@@ -292,7 +273,7 @@ export default async function AdminDashboard() {
                           {role === "graduate" && (
                             <Link
                               href="/dashboard/graduate"
-                              className="h-7 px-2.5 flex items-center rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                              className="h-7 px-2.5 flex items-center rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
                             >
                               عرض
                             </Link>
@@ -306,7 +287,7 @@ export default async function AdminDashboard() {
                             >
                               <button
                                 type="submit"
-                                className="h-7 px-2.5 rounded-lg bg-red-900/30 border border-red-800/40 text-red-500 text-xs hover:bg-red-900/50 transition"
+                                className="h-7 px-2.5 rounded-full bg-red-900/30 border border-red-800/40 text-red-500 text-xs hover:bg-red-900/50 transition"
                               >
                                 حذف
                               </button>

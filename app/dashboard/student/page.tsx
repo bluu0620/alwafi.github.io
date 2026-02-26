@@ -1,5 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import {
   LEVELS,
   FRIDAY_SCHEDULE,
@@ -71,6 +72,25 @@ export default async function StudentDashboard() {
   return (
     <div className="min-h-[calc(100vh-80px)] p-6">
       <div className="max-w-7xl mx-auto">
+
+        {/* Homework Banner */}
+        <div className="mb-6 bg-amber-900/10 rounded-2xl border border-amber-500/20 p-5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-2xl shrink-0">
+              📚
+            </div>
+            <div>
+              <p className="font-bold text-white text-lg">الواجبات</p>
+              <p className="text-sm text-purple-300/60">أرسل واجباتك الدراسية لمعلميك</p>
+            </div>
+          </div>
+          <Link
+            href="/dashboard/student/homework"
+            className="shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-l from-amber-500 to-amber-600 text-[#0f0f1a] font-bold text-sm hover:opacity-90 transition shadow-lg shadow-amber-500/20"
+          >
+            الواجبات
+          </Link>
+        </div>
 
         {/* Welcome Header */}
         <div className="mb-8">
