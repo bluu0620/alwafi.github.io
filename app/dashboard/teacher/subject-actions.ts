@@ -23,3 +23,22 @@ export async function saveTeacherSubjects(levelId: string, subjects: string[]) {
 
   revalidatePath(`/dashboard/teacher/class/${levelId}`);
 }
+
+export async function saveTeacherLevels(levels: string[]) {
+  const user = await currentUser();
+  if (!user) throw new Error("غير مصرح");
+
+  const role = user.unsafeMetadata?.role as string;
+  if (role !== "teacher" && role !== "admin") throw new Error("غير مصرح");
+
+  const client = await clerkClient();
+
+  await client.users.updateUserMetadata(user.id, {
+    unsafeMetadata: {
+      ...user.unsafeMetadata,
+      teacherLevels: levels,
+    },
+  });
+
+  revalidatePath("/dashboard/teacher");
+}

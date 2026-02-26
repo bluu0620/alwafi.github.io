@@ -5,6 +5,8 @@ import { updateUserRole, deleteUser, updateStudentLevel } from "./actions";
 import { LEVELS, ARABIC_LEVELS, ISLAMIC_LEVELS } from "@/lib/program-data";
 import { getLevelsConfig, getAllMergedLevels } from "@/lib/level-config";
 import { type AuditEntry } from "@/lib/audit-log";
+import { removeFineAction, toggleFinePaymentAction } from "@/app/dashboard/fines/actions";
+import { FINE_REASONS, type Fine } from "@/app/dashboard/fines/types";
 import { RoleSelect } from "./RoleSelect";
 import { AutoSaveSelect } from "./AutoSaveSelect";
 
@@ -344,6 +346,125 @@ export default async function AdminDashboard() {
             })}
           </div>
         </div>
+
+        {/* Fines Manager */}
+        {(() => {
+          type FineRow = Fine & { studentId: string; studentName: string; levelShort?: string };
+          const allFines: FineRow[] = [];
+          for (const u of users) {
+            if (u.unsafeMetadata?.role !== "student") continue;
+            const fines = (u.unsafeMetadata?.fines as Fine[] | undefined) ?? [];
+            const name =
+              `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() ||
+              u.emailAddresses[0]?.emailAddress ||
+              "طالب";
+            const lvl = u.unsafeMetadata?.level as string | undefined;
+            const levelShort = lvl ? LEVELS[lvl]?.shortName : undefined;
+            for (const fine of fines) {
+              allFines.push({ ...fine, studentId: u.id, studentName: name, levelShort });
+            }
+          }
+          allFines.sort((a, b) => new Date(b.issuedAt).getTime() - new Date(a.issuedAt).getTime());
+          const unpaidCount = allFines.filter((f) => !f.paid).length;
+
+          return (
+            <div className="mt-8 bg-red-900/10 rounded-2xl border border-red-500/20 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-red-400 flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">⚠️</span>
+                  إدارة الغرامات
+                </h2>
+                <div className="flex items-center gap-2">
+                  {unpaidCount > 0 && (
+                    <span className="px-3 py-1 rounded-full bg-red-500/20 border border-red-500/30 text-red-400 text-sm font-bold">
+                      {unpaidCount} غير مدفوعة
+                    </span>
+                  )}
+                  <span className="px-3 py-1 rounded-full bg-purple-900/40 border border-purple-700/30 text-purple-300/60 text-sm">
+                    {allFines.length} إجمالي
+                  </span>
+                </div>
+              </div>
+
+              {allFines.length === 0 ? (
+                <div className="text-center py-10">
+                  <p className="text-4xl mb-3">✅</p>
+                  <p className="text-purple-300/40 text-sm">لا توجد غرامات مسجلة</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {allFines.map((fine) => (
+                    <div
+                      key={fine.id}
+                      className={`rounded-xl border p-4 flex items-center gap-3 transition ${
+                        fine.paid
+                          ? "bg-green-900/10 border-green-800/20"
+                          : "bg-red-900/10 border-red-800/20"
+                      }`}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                          <Link
+                            href={`/dashboard/profile/${fine.studentId}`}
+                            className="font-bold text-sm text-white hover:text-amber-300 transition"
+                          >
+                            {fine.studentName}
+                          </Link>
+                          {fine.levelShort && (
+                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                              {fine.levelShort}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-red-400/80">
+                          {FINE_REASONS[fine.reason] ?? fine.reason}
+                          {fine.reason === "other" && fine.otherNote && (
+                            <span className="text-purple-300/50"> — {fine.otherNote}</span>
+                          )}
+                        </p>
+                        <p className="text-xs text-purple-300/40 mt-0.5">
+                          بواسطة: {fine.issuedByName} ·{" "}
+                          {new Date(fine.issuedAt).toLocaleDateString("ar-SA", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <form action={toggleFinePaymentAction}>
+                          <input type="hidden" name="studentId" value={fine.studentId} />
+                          <input type="hidden" name="fineId" value={fine.id} />
+                          <button
+                            type="submit"
+                            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ${
+                              fine.paid
+                                ? "bg-green-900/30 border-green-700/40 text-green-400 hover:bg-green-900/50"
+                                : "bg-yellow-900/20 border-yellow-700/30 text-yellow-500 hover:bg-yellow-900/40"
+                            }`}
+                          >
+                            {fine.paid ? "✓ مدفوعة" : "○ غير مدفوعة"}
+                          </button>
+                        </form>
+                        <form action={removeFineAction}>
+                          <input type="hidden" name="studentId" value={fine.studentId} />
+                          <input type="hidden" name="fineId" value={fine.id} />
+                          <button
+                            type="submit"
+                            className="px-2.5 py-1.5 rounded-lg bg-red-900/30 border border-red-800/40 text-red-500 text-xs hover:bg-red-900/50 transition"
+                          >
+                            حذف
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Channel Log — dev only */}
         {isDev && <div className="mt-8">

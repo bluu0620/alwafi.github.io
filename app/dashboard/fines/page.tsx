@@ -220,11 +220,20 @@ export default async function FinesPage() {
                   <Link
                     key={fine.id}
                     href={`/dashboard/profile/${fine.studentId}`}
-                    className="block bg-red-900/10 rounded-xl border border-red-500/15 p-4 hover:border-red-500/30 transition-colors"
+                    className={`block rounded-xl border p-4 transition-colors hover:border-red-500/30 ${
+                      fine.paid ? "bg-green-900/10 border-green-800/20" : "bg-red-900/10 border-red-500/15"
+                    }`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <p className="font-bold text-white text-sm">{fine.studentName}</p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-bold text-white text-sm">{fine.studentName}</p>
+                          {fine.paid ? (
+                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-green-500/20 border border-green-500/30 text-green-400">✓ مدفوعة</span>
+                          ) : (
+                            <span className="text-xs px-1.5 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-600/30 text-yellow-500">غير مدفوعة</span>
+                          )}
+                        </div>
                         <p className="text-xs text-red-400/80 mt-0.5">
                           {FINE_REASONS[fine.reason] ?? fine.reason}
                           {fine.reason === "other" && fine.otherNote && (

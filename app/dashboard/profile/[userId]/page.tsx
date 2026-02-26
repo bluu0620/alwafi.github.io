@@ -1,7 +1,7 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { LEVELS } from "@/lib/program-data";
-import { addFineAction, removeFineAction } from "@/app/dashboard/fines/actions";
+import { addFineAction, removeFineAction, toggleFinePaymentAction } from "@/app/dashboard/fines/actions";
 import { FINE_REASONS, type Fine } from "@/app/dashboard/fines/types";
 import Link from "next/link";
 
@@ -233,7 +233,9 @@ export default async function ProfilePage({
                   .map((fine) => (
                     <div
                       key={fine.id}
-                      className="bg-red-900/10 rounded-xl border border-red-500/20 p-4 flex items-center justify-between gap-4"
+                      className={`rounded-xl border p-4 flex items-center justify-between gap-4 transition ${
+                        fine.paid ? "bg-green-900/10 border-green-800/20" : "bg-red-900/10 border-red-500/20"
+                      }`}
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -242,6 +244,15 @@ export default async function ProfilePage({
                           </span>
                           {fine.reason === "other" && fine.otherNote && (
                             <span className="text-xs text-purple-300/60">— {fine.otherNote}</span>
+                          )}
+                          {fine.paid ? (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30 text-green-400">
+                              ✓ مدفوعة
+                            </span>
+                          ) : (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-600/30 text-yellow-500">
+                              غير مدفوعة
+                            </span>
                           )}
                         </div>
                         <div className="flex items-center gap-3 text-xs text-purple-300/50">
@@ -257,16 +268,32 @@ export default async function ProfilePage({
                         </div>
                       </div>
                       {canDeleteFines && (
-                        <form action={removeFineAction}>
-                          <input type="hidden" name="studentId" value={userId} />
-                          <input type="hidden" name="fineId" value={fine.id} />
-                          <button
-                            type="submit"
-                            className="px-3 py-1.5 rounded-lg bg-red-900/40 border border-red-800/40 text-red-400 text-xs hover:bg-red-900/60 transition shrink-0"
-                          >
-                            حذف
-                          </button>
-                        </form>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <form action={toggleFinePaymentAction}>
+                            <input type="hidden" name="studentId" value={userId} />
+                            <input type="hidden" name="fineId" value={fine.id} />
+                            <button
+                              type="submit"
+                              className={`px-2.5 py-1.5 rounded-lg text-xs font-bold border transition ${
+                                fine.paid
+                                  ? "bg-green-900/30 border-green-700/40 text-green-400 hover:bg-green-900/50"
+                                  : "bg-yellow-900/20 border-yellow-700/30 text-yellow-500 hover:bg-yellow-900/40"
+                              }`}
+                            >
+                              {fine.paid ? "✓ مدفوعة" : "○ غير مدفوعة"}
+                            </button>
+                          </form>
+                          <form action={removeFineAction}>
+                            <input type="hidden" name="studentId" value={userId} />
+                            <input type="hidden" name="fineId" value={fine.id} />
+                            <button
+                              type="submit"
+                              className="px-3 py-1.5 rounded-lg bg-red-900/40 border border-red-800/40 text-red-400 text-xs hover:bg-red-900/60 transition"
+                            >
+                              حذف
+                            </button>
+                          </form>
+                        </div>
                       )}
                     </div>
                   ))}

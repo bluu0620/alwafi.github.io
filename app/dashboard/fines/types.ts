@@ -5,6 +5,7 @@ export type Fine = {
   issuedByName: string;
   issuedById: string;
   issuedAt: string;
+  paid?: boolean;
 };
 
 export const FINE_REASONS: Record<string, string> = {

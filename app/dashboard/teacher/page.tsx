@@ -3,6 +3,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LEVELS } from "@/lib/program-data";
+import { LevelFilterPanel } from "./LevelFilterPanel";
 
 export default async function TeacherDashboard() {
   const user = await currentUser();
@@ -16,7 +17,12 @@ export default async function TeacherDashboard() {
   const { data: allUsers } = await client.users.getUserList({ limit: 200 });
   const students = allUsers.filter((u) => u.unsafeMetadata?.role === "student");
 
-  const deptLevels = Object.values(LEVELS);
+  const allLevels = Object.values(LEVELS);
+  const chosenLevels = (user.unsafeMetadata?.teacherLevels as string[] | undefined) ?? [];
+  const deptLevels =
+    chosenLevels.length > 0
+      ? allLevels.filter((l) => chosenLevels.includes(l.id))
+      : allLevels;
 
   return (
     <div className="min-h-[calc(100vh-80px)] p-6">
@@ -60,10 +66,13 @@ export default async function TeacherDashboard() {
 
         {/* Classes */}
         <div className="bg-purple-900/20 rounded-2xl border border-amber-500/10 p-6">
-          <h2 className="text-xl font-bold text-amber-400 mb-6 flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">📚</span>
-            الفصول الدراسية
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-amber-400 flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">📚</span>
+              الفصول الدراسية
+            </h2>
+            <LevelFilterPanel allLevels={allLevels} chosenLevels={chosenLevels} />
+          </div>
 
           {deptLevels.length === 0 ? (
             <p className="text-purple-300/40 text-sm text-center py-8">

@@ -62,9 +62,37 @@ export async function addFineAction(formData: FormData) {
   revalidatePath("/dashboard/admin");
 }
 
+export async function toggleFinePaymentAction(formData: FormData) {
+  const user = await currentUser();
+  const role = user?.unsafeMetadata?.role as string | undefined;
+  if (!user || (role !== "admin" && role !== "dev")) redirect("/");
+
+  const studentId = formData.get("studentId") as string;
+  const fineId = formData.get("fineId") as string;
+  if (!studentId || !fineId) return;
+
+  const client = await clerkClient();
+  const student = await client.users.getUser(studentId);
+  const existingFines = (student.unsafeMetadata?.fines as Fine[] | undefined) ?? [];
+
+  await client.users.updateUser(studentId, {
+    unsafeMetadata: {
+      ...student.unsafeMetadata,
+      fines: existingFines.map((f) =>
+        f.id === fineId ? { ...f, paid: !f.paid } : f
+      ),
+    },
+  });
+
+  revalidatePath("/dashboard/fines");
+  revalidatePath(`/dashboard/profile/${studentId}`);
+  revalidatePath("/dashboard/admin");
+}
+
 export async function removeFineAction(formData: FormData) {
   const user = await currentUser();
-  if (!user || user.unsafeMetadata?.role !== "admin") {
+  const role = user?.unsafeMetadata?.role as string | undefined;
+  if (!user || (role !== "admin" && role !== "dev")) {
     redirect("/");
   }
 
