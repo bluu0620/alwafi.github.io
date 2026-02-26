@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { updateUserRole, deleteUser, updateStudentLevel } from "./actions";
 import { LEVELS, ARABIC_LEVELS, ISLAMIC_LEVELS } from "@/lib/program-data";
+import { type AuditEntry } from "@/lib/audit-log";
 
 const ROLE_LABELS: Record<string, string> = {
   admin: "مدير",
@@ -27,6 +28,17 @@ export default async function AdminDashboard() {
 
   const client = await clerkClient();
   const { data: users } = await client.users.getUserList({ limit: 100 });
+
+  // Aggregate audit log from all users' metadata
+  const auditLog: AuditEntry[] = [];
+  for (const u of users) {
+    const log = (u.unsafeMetadata?.actionLog as AuditEntry[] | undefined) ?? [];
+    auditLog.push(...log);
+  }
+  auditLog.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
+  const recentLog = auditLog.slice(0, 75);
 
   return (
     <div className="min-h-[calc(100vh-80px)] p-6">
@@ -304,6 +316,64 @@ export default async function AdminDashboard() {
               );
             })}
           </div>
+        </div>
+
+        {/* Channel Log */}
+        <div className="mt-8 bg-purple-900/20 rounded-2xl border border-amber-500/10 p-6">
+          <h2 className="text-xl font-bold text-amber-400 mb-2 flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">🗒️</span>
+            Channel Log
+          </h2>
+          <p className="text-xs text-purple-300/40 mb-6 mr-13">All admin and fine activity — most recent first</p>
+
+          {recentLog.length === 0 ? (
+            <div className="text-center py-10">
+              <p className="text-3xl mb-3">📭</p>
+              <p className="text-purple-300/40 text-sm">No activity logged yet</p>
+            </div>
+          ) : (
+            <div className="space-y-1 font-mono text-sm">
+              {recentLog.map((entry) => {
+                const date = new Date(entry.timestamp);
+                const dateStr = date.toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "2-digit",
+                });
+                const timeStr = date.toLocaleTimeString("en-GB", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+
+                const actionColor: Record<string, string> = {
+                  "Role Changed": "text-amber-400",
+                  "Level Assigned": "text-blue-400",
+                  "User Deleted": "text-red-400",
+                  "Fine Issued": "text-orange-400",
+                  "Fine Removed": "text-green-400",
+                };
+                const color = actionColor[entry.action] ?? "text-purple-300";
+
+                return (
+                  <div
+                    key={entry.id}
+                    className="flex items-baseline gap-3 px-4 py-2.5 rounded-xl hover:bg-purple-900/30 transition-colors group"
+                  >
+                    <span className="text-purple-300/30 text-xs shrink-0 w-28" dir="ltr">
+                      {dateStr} {timeStr}
+                    </span>
+                    <span className={`font-bold shrink-0 text-xs uppercase tracking-wide ${color}`}>
+                      [{entry.action}]
+                    </span>
+                    <span className="text-white/80 flex-1">{entry.details}</span>
+                    <span className="text-purple-300/30 text-xs shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      by {entry.performedBy}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
       </div>

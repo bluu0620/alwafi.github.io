@@ -3,6 +3,7 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { logAuditEvent } from "@/lib/audit-log";
 
 export type Fine = {
   id: string;
@@ -14,7 +15,7 @@ export type Fine = {
 };
 
 export const FINE_REASONS: Record<string, string> = {
-  phone: "استخدام الهاتف في الوافي",
+  phone: "استخدام الجوال ",
   language: "التحدث بغير العربية",
   other: "أخرى",
 };
@@ -57,6 +58,19 @@ export async function addFineAction(formData: FormData) {
     },
   });
 
+  const studentName =
+    `${student.firstName ?? ""} ${student.lastName ?? ""}`.trim() ||
+    student.emailAddresses[0]?.emailAddress ||
+    "Unknown";
+  const issuerName =
+    `${issuer.firstName ?? ""} ${issuer.lastName ?? ""}`.trim() || "Unknown";
+  await logAuditEvent(
+    issuer.id,
+    issuerName,
+    "Fine Issued",
+    `${studentName} — ${FINE_REASONS[reason] ?? reason}${reason === "other" && otherNote ? `: ${otherNote}` : ""}`
+  );
+
   revalidatePath("/dashboard/fines");
   revalidatePath(`/dashboard/profile/${studentId}`);
   revalidatePath("/dashboard/admin");
@@ -76,6 +90,7 @@ export async function removeFineAction(formData: FormData) {
   const client = await clerkClient();
   const student = await client.users.getUser(studentId);
   const existingFines = (student.unsafeMetadata?.fines as Fine[] | undefined) ?? [];
+  const removedFine = existingFines.find((f) => f.id === fineId);
 
   await client.users.updateUser(studentId, {
     unsafeMetadata: {
@@ -83,6 +98,19 @@ export async function removeFineAction(formData: FormData) {
       fines: existingFines.filter((f) => f.id !== fineId),
     },
   });
+
+  const studentName =
+    `${student.firstName ?? ""} ${student.lastName ?? ""}`.trim() ||
+    student.emailAddresses[0]?.emailAddress ||
+    "Unknown";
+  const adminName =
+    `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || "Admin";
+  await logAuditEvent(
+    user.id,
+    adminName,
+    "Fine Removed",
+    `${studentName} — ${removedFine ? (FINE_REASONS[removedFine.reason] ?? removedFine.reason) : "Unknown fine"}`
+  );
 
   revalidatePath("/dashboard/fines");
   revalidatePath(`/dashboard/profile/${studentId}`);
