@@ -2,14 +2,13 @@ import { currentUser } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LEVELS, ARABIC_LEVELS, ISLAMIC_LEVELS } from "@/lib/program-data";
+import { LEVELS } from "@/lib/program-data";
 
 export default async function TeacherDashboard() {
   const user = await currentUser();
   if (!user) redirect("/");
 
   const role = user.unsafeMetadata?.role as string | undefined;
-  const department = user.unsafeMetadata?.department as string | undefined;
   if (role !== "teacher" && role !== "admin") redirect("/dashboard");
 
   // Load real student counts per level
@@ -17,12 +16,7 @@ export default async function TeacherDashboard() {
   const { data: allUsers } = await client.users.getUserList({ limit: 200 });
   const students = allUsers.filter((u) => u.unsafeMetadata?.role === "student");
 
-  const deptLevels =
-    role === "admin"
-      ? Object.values(LEVELS)
-      : department === "language"
-      ? ARABIC_LEVELS
-      : ISLAMIC_LEVELS;
+  const deptLevels = Object.values(LEVELS);
 
   return (
     <div className="min-h-[calc(100vh-80px)] p-6">
@@ -40,15 +34,6 @@ export default async function TeacherDashboard() {
               </h1>
               <div className="flex items-center gap-3 mt-1">
                 <p className="text-purple-300/60">لوحة تحكم المعلم - برنامج الوافي</p>
-                {department && (
-                  <span className={`px-3 py-0.5 rounded-full text-xs font-bold border ${
-                    department === "language"
-                      ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
-                      : "bg-blue-500/10 border-blue-500/30 text-blue-400"
-                  }`}>
-                    {department === "language" ? "لغوي" : "شرعي"}
-                  </span>
-                )}
               </div>
             </div>
           </div>

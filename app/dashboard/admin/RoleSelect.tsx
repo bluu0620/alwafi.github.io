@@ -22,21 +22,27 @@ export function RoleSelect({
 
   return (
     <form ref={formRef} action={action}>
-      <select
-        name="combined"
-        value={selected}
-        onChange={(e) => {
-          setSelected(e.target.value);
-          formRef.current?.requestSubmit();
-        }}
-        className={`h-7 text-xs border rounded-full px-3 pr-7 text-center focus:outline-none transition-colors cursor-pointer ${roleData.color}`}
-      >
-        {ROLES.map((r) => (
-          <option key={r.value} value={r.value}>
-            {r.label}
-          </option>
-        ))}
-      </select>
+      <div className="relative inline-block">
+        <select
+          name="combined"
+          value={selected}
+          onChange={(e) => {
+            setSelected(e.target.value);
+            formRef.current?.requestSubmit();
+          }}
+          className={`appearance-none h-7 text-xs border rounded-full px-3 pl-7 text-center focus:outline-none transition-colors cursor-pointer ${roleData.color}`}
+        >
+          {ROLES.map((r) => (
+            <option key={r.value} value={r.value}>
+              {r.label}
+            </option>
+          ))}
+        </select>
+        {/* RTL: arrow on the left */}
+        <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[9px] opacity-50">
+          ▾
+        </span>
+      </div>
     </form>
   );
 }

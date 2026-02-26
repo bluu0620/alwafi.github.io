@@ -19,14 +19,20 @@ export function AutoSaveSelect({
 
   return (
     <form ref={formRef} action={action}>
-      <select
-        name={name}
-        defaultValue={defaultValue}
-        onChange={() => formRef.current?.requestSubmit()}
-        className={className}
-      >
-        {children}
-      </select>
+      <div className="relative inline-block">
+        <select
+          name={name}
+          defaultValue={defaultValue}
+          onChange={() => formRef.current?.requestSubmit()}
+          className={`appearance-none pl-6 ${className ?? ""}`}
+        >
+          {children}
+        </select>
+        {/* RTL: arrow on the left side */}
+        <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-[9px] opacity-50">
+          ▾
+        </span>
+      </div>
     </form>
   );
 }

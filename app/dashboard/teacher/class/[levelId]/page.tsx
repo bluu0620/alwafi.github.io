@@ -6,6 +6,7 @@ import { LEVELS } from "@/lib/program-data";
 import { type HomeworkData, type Submission } from "@/lib/homework-types";
 import { getAnnouncements } from "@/lib/announcements";
 import { postAnnouncement, deleteAnnouncement } from "@/app/dashboard/homework/announcement-actions";
+import { SubjectFilterPanel } from "./SubjectFilterPanel";
 
 function formatBytes(bytes: number) {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
@@ -48,32 +49,19 @@ export default async function TeacherClassPage({
   if (!user) redirect("/");
 
   const role = user.unsafeMetadata?.role as string | undefined;
-  const dept = user.unsafeMetadata?.department as string | undefined;
   if (role !== "teacher" && role !== "admin") redirect("/dashboard");
 
   const { levelId } = await params;
   const levelData = LEVELS[levelId];
   if (!levelData) notFound();
 
-  // Teachers can only see their department's levels
-  if (role === "teacher") {
-    const deptMap: Record<string, "arabic" | "islamic"> = {
-      language: "arabic",
-      sharia: "islamic",
-    };
-    if (deptMap[dept ?? ""] !== levelData.department) redirect("/dashboard/teacher");
-  }
-
-  // Filter subjects by teacher department (language → arabic subjects only, sharia → islamic)
-  const subjects =
-    role === "admin"
-      ? levelData.subjects
-      : dept === "language"
-      ? levelData.subjects.filter((s) => levelData.department === "arabic")
-      : levelData.subjects.filter((s) => levelData.department === "islamic");
-  // Since levels are already department-specific, this effectively shows all subjects
-  // for the level, but makes the intent explicit and future-proof.
-  const displaySubjects = subjects.length > 0 ? subjects : levelData.subjects;
+  // Teacher's chosen visible subjects for this level (empty = show all)
+  const teacherSubjects = (user.unsafeMetadata?.teacherSubjects as Record<string, string[]> | undefined) ?? {};
+  const chosenSubjects = teacherSubjects[levelId];
+  const displaySubjects =
+    chosenSubjects && chosenSubjects.length > 0
+      ? levelData.subjects.filter((s) => chosenSubjects.includes(s.name))
+      : levelData.subjects;
 
   const client = await clerkClient();
   const { data: allUsers } = await client.users.getUserList({ limit: 200 });
@@ -117,9 +105,16 @@ export default async function TeacherClassPage({
 
           {/* Subject sidebar */}
           <div className="bg-purple-900/20 rounded-2xl border border-amber-500/10 p-4 h-fit">
-            <p className="text-xs font-bold text-purple-300/50 uppercase tracking-wider mb-3 px-1">
-              المواد
-            </p>
+            <div className="flex items-center justify-between mb-3 px-1">
+              <p className="text-xs font-bold text-purple-300/50 uppercase tracking-wider">
+                المواد
+              </p>
+              <SubjectFilterPanel
+                levelId={levelId}
+                allSubjects={levelData.subjects}
+                chosenSubjects={chosenSubjects ?? []}
+              />
+            </div>
             <div className="space-y-1">
               {displaySubjects.map((s) => {
                 const totalSubmissions = students.reduce((acc, st) => {

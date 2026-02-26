@@ -1,7 +1,7 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { updateUserRole, deleteUser, updateStudentLevel, updateTeacherDepartment } from "./actions";
+import { updateUserRole, deleteUser, updateStudentLevel } from "./actions";
 import { LEVELS, ARABIC_LEVELS, ISLAMIC_LEVELS } from "@/lib/program-data";
 import { type AuditEntry } from "@/lib/audit-log";
 import { RoleSelect } from "./RoleSelect";
@@ -97,7 +97,7 @@ export default async function AdminDashboard() {
                   <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40 rounded-r-xl">المستخدم</th>
                   <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40">البريد</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">الدور</th>
-                  <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">القسم / المستوى</th>
+                  <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">المستوى</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">تاريخ الإنشاء</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40 rounded-l-xl">الإجراءات</th>
                 </tr>
@@ -162,36 +162,10 @@ export default async function AdminDashboard() {
                         )}
                       </td>
 
-                      {/* Level / Department */}
+                      {/* Level */}
                       <td className="p-4 text-center">
                         {role === "teacher" ? (
-                          <div className="flex flex-col items-center gap-2">
-                            {department ? (
-                              <span className={`inline-block px-2 py-1 rounded-full text-xs font-bold border ${
-                                department === "language"
-                                  ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
-                                  : "bg-blue-500/10 border-blue-500/30 text-blue-400"
-                              }`}>
-                                {department === "language" ? "لغوي" : "شرعي"}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-purple-300/40">غير محدد</span>
-                            )}
-                            <AutoSaveSelect
-                              name="department"
-                              defaultValue={department}
-                              action={async (formData: FormData) => {
-                                "use server";
-                                const newDept = formData.get("department") as string;
-                                await updateTeacherDepartment(u.id, newDept);
-                              }}
-                              className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-full px-3 pr-7 text-center focus:outline-none focus:border-amber-500/50"
-                            >
-                              <option value="">— بدون قسم —</option>
-                              <option value="language">لغوي</option>
-                              <option value="sharia">شرعي</option>
-                            </AutoSaveSelect>
-                          </div>
+                          <span className="text-xs text-purple-300/30">—</span>
                         ) : role === "student" ? (
                           <div className="flex flex-col items-center gap-2">
                             {levelData ? (

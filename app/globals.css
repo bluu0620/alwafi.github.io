@@ -5,6 +5,12 @@
   --color-gold: #f59e0b;
 }
 
+/* Light mode: re-invert images so they display correctly (CSS filter double-inversion) */
+.theme-root[data-mode="light"] img,
+.theme-root[data-mode="light"] video {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 @theme inline {
   --font-cairo: var(--font-cairo);
 }
