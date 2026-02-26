@@ -5,79 +5,207 @@
   --color-gold: #f59e0b;
 }
 
-/* ====== THEME-AWARE OVERRIDES ====== */
-/* The .theme-root div has CSS custom properties set inline by ThemeWrapper.
-   These rules override hardcoded Tailwind color classes inside that div. */
+/* ====== THEME-AWARE OVERRIDES ======
+   ThemeWrapper injects CSS custom properties (--bg-page, --accent, --cta, etc.)
+   as inline styles. The rules below override hardcoded Tailwind color classes
+   to pick up those variables so every component is fully themed.               */
 
-/* --- Card / panel backgrounds (purple-tinted panels become --bg-card) --- */
-.theme-root [class*="bg-purple-900"] {
+
+/* ── CARD / PANEL BACKGROUNDS ─────────────────────────────────────────────── */
+
+/* Light panels (20-30 % purple) → --bg-card */
+.theme-root [class*="bg-purple-900/2"],
+.theme-root [class*="bg-purple-900/3"] {
   background-color: var(--bg-card) !important;
 }
-.theme-root [class*="bg-purple-800"] {
+/* Heavier panels (40-60 % purple) → --bg-card-2 */
+.theme-root [class*="bg-purple-900/4"],
+.theme-root [class*="bg-purple-900/5"],
+.theme-root [class*="bg-purple-900/6"] {
   background-color: var(--bg-card-2) !important;
 }
+/* Any other purple-800/900 panel */
+.theme-root [class*="bg-purple-800"],
+.theme-root [class*="bg-purple-900/8"],
+.theme-root [class*="bg-purple-900/1"] {
+  background-color: var(--bg-card-2) !important;
+}
+/* Student-badge purple-500 panel */
+.theme-root [class*="bg-purple-5/"] {
+  background-color: color-mix(in srgb, var(--text-muted) 14%, transparent) !important;
+}
 
-/* --- Accent text (amber) → --accent --- */
+
+/* ── ACCENT (AMBER) BACKGROUNDS ───────────────────────────────────────────── */
+
+/* Very subtle accent chips (bg-amber-500/10, /15) */
+.theme-root [class*="bg-amber-5/"] {
+  background-color: color-mix(in srgb, var(--accent) 14%, transparent) !important;
+}
+/* Moderate accent panels (bg-amber-900/20, bg-amber-900/30) */
+.theme-root [class*="bg-amber-9/"] {
+  background-color: color-mix(in srgb, var(--accent) 22%, transparent) !important;
+}
+/* Solid amber dot → solid accent */
+.theme-root .bg-amber-500 {
+  background-color: var(--accent) !important;
+}
+
+
+/* ── ORANGE BACKGROUNDS (calendar exam_second) ────────────────────────────── */
+
+.theme-root [class*="bg-orange-9/"] {
+  background-color: color-mix(in srgb, var(--cta) 22%, transparent) !important;
+}
+.theme-root [class*="bg-orange-5/"] {
+  background-color: color-mix(in srgb, var(--cta) 14%, transparent) !important;
+}
+.theme-root .bg-orange-500 {
+  background-color: var(--cta) !important;
+}
+
+
+/* ── GREEN BACKGROUNDS (calendar break / graduate badge) ─────────────────── */
+
+.theme-root [class*="bg-green-9/"] {
+  background-color: color-mix(in srgb, var(--accent-2) 22%, transparent) !important;
+}
+.theme-root [class*="bg-green-5/"] {
+  background-color: color-mix(in srgb, var(--accent-2) 14%, transparent) !important;
+}
+.theme-root .bg-green-500 {
+  background-color: var(--accent-2) !important;
+}
+
+
+/* ── PINK BACKGROUNDS (calendar ceremony) ────────────────────────────────── */
+
+.theme-root [class*="bg-pink-9/"] {
+  background-color: color-mix(in srgb, var(--accent) 22%, transparent) !important;
+}
+.theme-root [class*="bg-pink-5/"] {
+  background-color: color-mix(in srgb, var(--accent) 14%, transparent) !important;
+}
+.theme-root .bg-pink-500 {
+  background-color: var(--accent) !important;
+}
+
+
+/* ── RED BACKGROUNDS (danger / admin / final-exam) – keep red, just desaturate */
+
+.theme-root [class*="bg-red-9/"] {
+  background-color: rgba(160, 28, 28, 0.18) !important;
+}
+.theme-root [class*="bg-red-5/"] {
+  background-color: rgba(160, 28, 28, 0.12) !important;
+}
+
+
+/* ── TEXT COLORS ──────────────────────────────────────────────────────────── */
+
+/* Amber / gold text → primary accent */
 .theme-root [class*="text-amber"] {
   color: var(--accent) !important;
 }
-.theme-root [class*="text-yellow"] {
+/* Orange text → CTA color */
+.theme-root [class*="text-orange"] {
+  color: var(--cta) !important;
+}
+/* Green text → accent-2 */
+.theme-root [class*="text-green-3"],
+.theme-root [class*="text-green-4"] {
+  color: var(--accent-2) !important;
+}
+/* Pink text → accent */
+.theme-root [class*="text-pink"] {
   color: var(--accent) !important;
 }
-
-/* --- Muted/secondary text (purple-300, purple-400) → --text-muted --- */
+/* Muted purple text */
+.theme-root [class*="text-purple-2"],
 .theme-root [class*="text-purple-3"],
 .theme-root [class*="text-purple-4"] {
   color: var(--text-muted) !important;
 }
-.theme-root [class*="text-purple-2"] {
-  color: var(--text-muted) !important;
-}
-
-/* --- White text in light mode → --text-bright --- */
-.theme-root[data-mode="light"] .text-white {
+/* White text in light mode → dark readable color */
+.theme-root[data-mode="light"] [class*="text-white"] {
   color: var(--text-bright) !important;
 }
+/* CTA button text (dark on original amber) → theme-correct contrast */
+.theme-root [class*="text-[#0f0f1a]"] {
+  color: var(--cta-text) !important;
+}
 
-/* --- Accent borders (amber) → --border-accent --- */
+
+/* ── TEXT GRADIENT CLIP (from-amber headings) ─────────────────────────────── */
+
+.theme-root [class*="from-amber"][class*="bg-clip-text"],
+.theme-root [class*="from-amber"][class*="text-transparent"] {
+  background-image: linear-gradient(to left, var(--accent), color-mix(in srgb, var(--accent) 70%, #fff)) !important;
+}
+
+
+/* ── BORDERS ──────────────────────────────────────────────────────────────── */
+
+/* Amber borders → accent */
 .theme-root [class*="border-amber"] {
   border-color: var(--border-accent) !important;
 }
-
-/* --- Subtle borders (purple) → --border --- */
-.theme-root [class*="border-purple"] {
+/* Purple borders → subtle border */
+.theme-root [class*="border-purple-7"],
+.theme-root [class*="border-purple-8"],
+.theme-root [class*="border-purple-9"] {
   border-color: var(--border) !important;
 }
-
-/* --- Accent low-opacity backgrounds (chips, tags) → color-mix with --accent --- */
-.theme-root [class*="bg-amber"] {
-  background-color: color-mix(in srgb, var(--accent) 15%, transparent) !important;
+/* Student badge border */
+.theme-root [class*="border-purple-5"] {
+  border-color: color-mix(in srgb, var(--text-muted) 30%, transparent) !important;
+}
+/* Graduate badge border */
+.theme-root [class*="border-green-5"],
+.theme-root [class*="border-green-6"] {
+  border-color: color-mix(in srgb, var(--accent-2) 35%, transparent) !important;
+}
+/* Orange/exam_second border */
+.theme-root [class*="border-orange"] {
+  border-color: color-mix(in srgb, var(--cta) 35%, transparent) !important;
+}
+/* Pink/ceremony border */
+.theme-root [class*="border-pink"] {
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent) !important;
+}
+/* Red border – keep red */
+.theme-root [class*="border-red-5"],
+.theme-root [class*="border-red-6"],
+.theme-root [class*="border-red-7"] {
+  border-color: rgba(220, 38, 38, 0.35) !important;
 }
 
-/* --- CTA gradient buttons → use --cta as solid color --- */
+
+/* ── RING (focus / active) ────────────────────────────────────────────────── */
+
+.theme-root [class*="ring-amber"] {
+  --tw-ring-color: var(--border-accent) !important;
+}
+
+
+/* ── CTA GRADIENT BUTTONS ─────────────────────────────────────────────────── */
+
 .theme-root [class*="from-amber-5"],
 .theme-root [class*="from-amber-4"] {
-  --tw-gradient-from: var(--cta) !important;
-  background-image: linear-gradient(to left, color-mix(in srgb, var(--cta) 80%, #000), var(--cta)) !important;
+  background-image: linear-gradient(
+    to left,
+    color-mix(in srgb, var(--cta) 75%, #000 25%),
+    var(--cta)
+  ) !important;
+}
+/* Shadow on amber gradient buttons → cta-tinted */
+.theme-root [class*="shadow-amber"] {
+  --tw-shadow-color: color-mix(in srgb, var(--cta) 30%, transparent) !important;
 }
 
-/* --- Red/destructive elements keep their color (don't override) --- */
 
-/* --- Green success elements keep their color --- */
-
-/* Light mode: header and fixed overlays */
-.theme-root[data-mode="light"] [class*="bg-red-9"] {
-  background-color: color-mix(in srgb, #dc2626 15%, transparent) !important;
-}
-.theme-root[data-mode="light"] [class*="text-red-4"] {
-  color: #dc2626 !important;
-}
-.theme-root[data-mode="light"] [class*="border-red-8"] {
-  border-color: rgba(220, 38, 38, 0.3) !important;
-}
-.theme-root[data-mode="light"] [class*="text-green-4"] {
-  color: #16a34a !important;
-}
+/* ── BACKDROP / HEADER BACKGROUND ─────────────────────────────────────────── */
+/* (Handled via inline style in layout.tsx — no override needed here) */
 
 @theme inline {
   --font-cairo: var(--font-cairo);

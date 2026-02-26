@@ -66,6 +66,9 @@ export default async function RootLayout({
                     </span>
                   </Link>
                   <div className="flex gap-3 items-center">
+                    {/* Theme palette dots */}
+                    <ThemeBar />
+                    {/* Dark / light toggle */}
                     <DarkModeToggle />
                     <SignedOut>
                       <SignInButton mode="modal">
@@ -93,11 +96,10 @@ export default async function RootLayout({
                 </div>
               </header>
 
-              <div className="relative pb-24">
+              <div className="relative">
                 {children}
               </div>
 
-              <ThemeBar />
             </ThemeWrapper>
           </ThemeProvider>
         </body>

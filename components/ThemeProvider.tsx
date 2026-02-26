@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState } from "react";
 
-export type ThemeName = "solar" | "earth" | "arctic" | "neon" | "pastel";
+export type ThemeName = "solar" | "earth" | "arctic" | "neon" | "pastel" | "mono";
 export type ThemeMode = "dark" | "light";
 
 interface ThemeCtx {
