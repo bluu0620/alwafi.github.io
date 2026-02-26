@@ -15,11 +15,13 @@ export default async function DashboardPage() {
     redirect("/dashboard/admin");
   } else if (role === "teacher") {
     redirect("/dashboard/teacher");
-  } else {
-    // Students without a level go to onboarding first
+  } else if (role === "student") {
     if (!level) {
       redirect("/onboarding");
     }
     redirect("/dashboard/student");
+  } else {
+    // No role assigned yet — send back to home
+    redirect("/");
   }
 }
