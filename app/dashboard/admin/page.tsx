@@ -1,6 +1,7 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { updateUserRole, deleteUser } from "./actions";
+import { updateUserRole, deleteUser, updateStudentLevel } from "./actions";
+import { LEVELS, ARABIC_LEVELS, ISLAMIC_LEVELS } from "@/lib/program-data";
 
 const ROLE_LABELS: Record<string, string> = {
   admin: "مدير",
@@ -72,8 +73,9 @@ export default async function AdminDashboard() {
               <thead>
                 <tr>
                   <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40 rounded-r-xl">المستخدم</th>
-                  <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40">البريد الإلكتروني</th>
+                  <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40">البريد</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">الدور</th>
+                  <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">المستوى</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">تاريخ الإنشاء</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40 rounded-l-xl">الإجراءات</th>
                 </tr>
@@ -81,13 +83,21 @@ export default async function AdminDashboard() {
               <tbody>
                 {users.map((u) => {
                   const role = (u.unsafeMetadata?.role as string) || "none";
-                  const initials = ((u.firstName?.[0] || "") + (u.lastName?.[0] || "")) || u.emailAddresses[0]?.emailAddress?.[0]?.toUpperCase() || "؟";
+                  const level = (u.unsafeMetadata?.level as string) || "";
+                  const levelData = level ? LEVELS[level] : null;
+                  const initials =
+                    ((u.firstName?.[0] || "") + (u.lastName?.[0] || "")) ||
+                    u.emailAddresses[0]?.emailAddress?.[0]?.toUpperCase() ||
+                    "؟";
                   const email = u.emailAddresses[0]?.emailAddress || "-";
                   const createdAt = new Date(u.createdAt).toLocaleDateString("en-GB");
                   const isSelf = u.id === user.id;
 
                   return (
-                    <tr key={u.id} className={`border-b border-purple-800/30 hover:bg-purple-900/30 transition ${isSelf ? "bg-amber-500/5" : ""}`}>
+                    <tr
+                      key={u.id}
+                      className={`border-b border-purple-800/30 hover:bg-purple-900/30 transition ${isSelf ? "bg-amber-500/5" : ""}`}
+                    >
                       {/* User */}
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -97,7 +107,9 @@ export default async function AdminDashboard() {
                           <div>
                             <p className="font-medium text-white">
                               {u.firstName || ""} {u.lastName || ""}
-                              {isSelf && <span className="mr-2 text-xs text-amber-400/70">(أنت)</span>}
+                              {isSelf && (
+                                <span className="mr-2 text-xs text-amber-400/70">(أنت)</span>
+                              )}
                             </p>
                             <p className="text-xs text-purple-400/50">{u.id.slice(0, 16)}...</p>
                           </div>
@@ -105,45 +117,138 @@ export default async function AdminDashboard() {
                       </td>
 
                       {/* Email */}
-                      <td className="p-4 text-purple-300/60 text-left" dir="ltr">{email}</td>
+                      <td className="p-4 text-purple-300/60 text-left" dir="ltr">
+                        {email}
+                      </td>
 
                       {/* Role Badge */}
                       <td className="p-4 text-center">
-                        <span className={`inline-block px-3 py-1 rounded-full border text-xs font-bold ${ROLE_COLORS[role] || "bg-purple-900/40 border-purple-700 text-purple-400"}`}>
+                        <span
+                          className={`inline-block px-3 py-1 rounded-full border text-xs font-bold ${
+                            ROLE_COLORS[role] || "bg-purple-900/40 border-purple-700 text-purple-400"
+                          }`}
+                        >
                           {ROLE_LABELS[role] || "غير محدد"}
                         </span>
                       </td>
 
+                      {/* Level Badge / Assignment */}
+                      <td className="p-4 text-center">
+                        {role === "student" ? (
+                          <div className="flex flex-col items-center gap-2">
+                            {levelData ? (
+                              <span className="inline-block px-2 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
+                                {levelData.shortName}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-purple-300/40">غير محدد</span>
+                            )}
+                            <form
+                              action={async (formData: FormData) => {
+                                "use server";
+                                const newLevel = formData.get("level") as string;
+                                await updateStudentLevel(u.id, newLevel);
+                              }}
+                              className="flex items-center gap-1"
+                            >
+                              <select
+                                name="level"
+                                defaultValue={level}
+                                className="text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-lg px-2 py-1 focus:outline-none focus:border-amber-500/50 max-w-[120px]"
+                              >
+                                <option value="">— بدون مستوى —</option>
+                                <optgroup label="قسم اللغة العربية">
+                                  {ARABIC_LEVELS.map((lvl) => (
+                                    <option key={lvl.id} value={lvl.id}>
+                                      {lvl.name}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                                <optgroup label="القسم الشرعي">
+                                  {ISLAMIC_LEVELS.map((lvl) => (
+                                    <option key={lvl.id} value={lvl.id}>
+                                      {lvl.name}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              </select>
+                              <button
+                                type="submit"
+                                className="px-2 py-1 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
+                              >
+                                حفظ
+                              </button>
+                            </form>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-purple-300/30">—</span>
+                        )}
+                      </td>
+
                       {/* Created */}
-                      <td className="p-4 text-center text-purple-300/60 text-xs" dir="ltr">{createdAt}</td>
+                      <td className="p-4 text-center text-purple-300/60 text-xs" dir="ltr">
+                        {createdAt}
+                      </td>
 
                       {/* Actions */}
                       <td className="p-4">
                         <div className="flex items-center justify-center gap-2 flex-wrap">
                           {role !== "student" && (
-                            <form action={async () => { "use server"; await updateUserRole(u.id, "student"); }}>
-                              <button type="submit" className="px-3 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-500/30 transition">
+                            <form
+                              action={async () => {
+                                "use server";
+                                await updateUserRole(u.id, "student");
+                              }}
+                            >
+                              <button
+                                type="submit"
+                                className="px-3 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-500/30 transition"
+                              >
                                 طالب
                               </button>
                             </form>
                           )}
                           {role !== "teacher" && (
-                            <form action={async () => { "use server"; await updateUserRole(u.id, "teacher"); }}>
-                              <button type="submit" className="px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition">
+                            <form
+                              action={async () => {
+                                "use server";
+                                await updateUserRole(u.id, "teacher");
+                              }}
+                            >
+                              <button
+                                type="submit"
+                                className="px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
+                              >
                                 معلم
                               </button>
                             </form>
                           )}
                           {role !== "admin" && (
-                            <form action={async () => { "use server"; await updateUserRole(u.id, "admin"); }}>
-                              <button type="submit" className="px-3 py-1.5 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-xs hover:bg-red-500/30 transition">
+                            <form
+                              action={async () => {
+                                "use server";
+                                await updateUserRole(u.id, "admin");
+                              }}
+                            >
+                              <button
+                                type="submit"
+                                className="px-3 py-1.5 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-xs hover:bg-red-500/30 transition"
+                              >
                                 مدير
                               </button>
                             </form>
                           )}
                           {!isSelf && (
-                            <form action={async () => { "use server"; await deleteUser(u.id); }}>
-                              <button type="submit" className="px-3 py-1.5 rounded-lg bg-red-900/30 border border-red-800/40 text-red-500 text-xs hover:bg-red-900/50 transition">
+                            <form
+                              action={async () => {
+                                "use server";
+                                await deleteUser(u.id);
+                              }}
+                            >
+                              <button
+                                type="submit"
+                                className="px-3 py-1.5 rounded-lg bg-red-900/30 border border-red-800/40 text-red-500 text-xs hover:bg-red-900/50 transition"
+                              >
                                 حذف
                               </button>
                             </form>
@@ -157,6 +262,34 @@ export default async function AdminDashboard() {
             </table>
           </div>
         </div>
+
+        {/* Level Overview */}
+        <div className="mt-8 bg-purple-900/20 rounded-2xl border border-amber-500/10 p-6">
+          <h2 className="text-xl font-bold text-amber-400 mb-6 flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">📊</span>
+            توزيع الطلاب على المستويات
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {Object.values(LEVELS).map((lvl) => {
+              const count = users.filter(
+                (u) => u.unsafeMetadata?.level === lvl.id
+              ).length;
+              return (
+                <div
+                  key={lvl.id}
+                  className="bg-purple-900/30 rounded-xl p-4 border border-purple-800/30 text-center"
+                >
+                  <p className="text-2xl font-bold text-amber-400">{count}</p>
+                  <p className="text-sm text-white font-medium mt-1">{lvl.name}</p>
+                  <p className="text-xs text-purple-300/50 mt-0.5">
+                    {lvl.department === "arabic" ? "عربي" : "شرعي"}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
       </div>
     </div>
   );

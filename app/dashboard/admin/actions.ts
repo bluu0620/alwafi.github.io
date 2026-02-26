@@ -2,6 +2,7 @@
 
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { LEVELS } from "@/lib/program-data";
 
 async function requireAdmin() {
   const user = await currentUser();
@@ -14,8 +15,28 @@ async function requireAdmin() {
 export async function updateUserRole(userId: string, role: string) {
   await requireAdmin();
   const client = await clerkClient();
+  // Preserve existing metadata fields (e.g. level) when updating role
+  const existingUser = await client.users.getUser(userId);
   await client.users.updateUser(userId, {
-    unsafeMetadata: { role },
+    unsafeMetadata: {
+      ...existingUser.unsafeMetadata,
+      role,
+    },
+  });
+}
+
+export async function updateStudentLevel(userId: string, level: string) {
+  await requireAdmin();
+  if (level && !Object.keys(LEVELS).includes(level)) {
+    throw new Error("مستوى غير صالح");
+  }
+  const client = await clerkClient();
+  const existingUser = await client.users.getUser(userId);
+  await client.users.updateUser(userId, {
+    unsafeMetadata: {
+      ...existingUser.unsafeMetadata,
+      level: level || undefined,
+    },
   });
 }
 
