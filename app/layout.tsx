@@ -9,6 +9,7 @@ import {
 import { arSA } from "@clerk/localizations";
 import { Cairo } from "next/font/google";
 import Link from "next/link";
+import Image from "next/image";
 import "./globals.css";
 
 const cairo = Cairo({
@@ -39,11 +40,13 @@ export default function RootLayout({
           <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#0f0f1a]/80 border-b border-amber-500/10">
             <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
               <Link href="/" className="flex items-center gap-3 group">
-                <div className="relative w-11 h-11">
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl rotate-45 group-hover:rotate-[50deg] transition-transform duration-300" />
-                  <div className="absolute inset-[3px] bg-[#0f0f1a] rounded-lg rotate-45" />
-                  <span className="absolute inset-0 flex items-center justify-center font-bold text-amber-400 text-lg">و</span>
-                </div>
+                <Image
+                  src="/wafilogo.png"
+                  alt="شعار الوافي"
+                  width={44}
+                  height={44}
+                  className="rounded-xl"
+                />
                 <span className="text-xl font-bold text-amber-400">
                   برنامج الوافي
                 </span>

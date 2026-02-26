@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 export default function Home() {
@@ -7,9 +8,13 @@ export default function Home() {
       <div className="w-full max-w-md text-center">
 
         {/* Logo */}
-        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-[#0f0f1a] font-bold text-4xl mx-auto mb-6">
-          و
-        </div>
+        <Image
+          src="/wafilogo.png"
+          alt="شعار الوافي"
+          width={80}
+          height={80}
+          className="rounded-3xl mx-auto mb-6"
+        />
 
         <h1 className="text-4xl font-bold text-amber-400 mb-2">برنامج الوافي</h1>
         <p className="text-purple-300/50 mb-10">الفصل الثاني — ١٤٤٧هـ</p>
