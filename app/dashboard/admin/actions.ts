@@ -46,4 +46,5 @@ export async function deleteUser(userId: string) {
   await requireAdmin();
   const client = await clerkClient();
   await client.users.deleteUser(userId);
+  revalidatePath("/dashboard/admin");
 }
