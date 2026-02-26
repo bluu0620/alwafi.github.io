@@ -29,7 +29,7 @@ export default async function AdminDashboard() {
   const client = await clerkClient();
   const { data: users } = await client.users.getUserList({ limit: 100 });
 
-  // Aggregate audit log from all users' metadata
+  // Aggregate in-site audit log from all users' metadata
   const auditLog: AuditEntry[] = [];
   for (const u of users) {
     const log = (u.unsafeMetadata?.actionLog as AuditEntry[] | undefined) ?? [];
@@ -38,7 +38,29 @@ export default async function AdminDashboard() {
   auditLog.sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );
-  const recentLog = auditLog.slice(0, 75);
+  const recentLog = auditLog.slice(0, 50);
+
+  // Fetch recent GitHub commits (code changes)
+  type GitCommit = {
+    sha: string;
+    commit: {
+      message: string;
+      author: { name: string; date: string };
+    };
+    html_url: string;
+  };
+  let commits: GitCommit[] = [];
+  try {
+    const headers: Record<string, string> = { "User-Agent": "wafi-admin" };
+    if (process.env.GITHUB_TOKEN) headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
+    const res = await fetch(
+      "https://api.github.com/repos/bluu0620/alwafi.github.io/commits?per_page=30",
+      { headers, next: { revalidate: 60 } }
+    );
+    if (res.ok) commits = await res.json();
+  } catch {
+    // GitHub API unavailable — skip silently
+  }
 
   return (
     <div className="min-h-[calc(100vh-80px)] p-6">
@@ -319,61 +341,112 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Channel Log */}
-        <div className="mt-8 bg-purple-900/20 rounded-2xl border border-amber-500/10 p-6">
-          <h2 className="text-xl font-bold text-amber-400 mb-2 flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">🗒️</span>
-            Channel Log
-          </h2>
-          <p className="text-xs text-purple-300/40 mb-6 mr-13">All admin and fine activity — most recent first</p>
-
-          {recentLog.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-3xl mb-3">📭</p>
-              <p className="text-purple-300/40 text-sm">No activity logged yet</p>
+        <div className="mt-8">
+          <div className="flex items-center gap-4 mb-4">
+            <span className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-lg">🗒️</span>
+            <div>
+              <h2 className="text-xl font-bold text-amber-400">Channel Log</h2>
+              <p className="text-xs text-purple-300/40">Code changes and in-site activity — most recent first</p>
             </div>
-          ) : (
-            <div className="space-y-1 font-mono text-sm">
-              {recentLog.map((entry) => {
-                const date = new Date(entry.timestamp);
-                const dateStr = date.toLocaleDateString("en-GB", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "2-digit",
-                });
-                const timeStr = date.toLocaleTimeString("en-GB", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
+          </div>
 
-                const actionColor: Record<string, string> = {
-                  "Role Changed": "text-amber-400",
-                  "Level Assigned": "text-blue-400",
-                  "User Deleted": "text-red-400",
-                  "Fine Issued": "text-orange-400",
-                  "Fine Removed": "text-green-400",
-                };
-                const color = actionColor[entry.action] ?? "text-purple-300";
+          <div className="grid lg:grid-cols-2 gap-6">
 
-                return (
-                  <div
-                    key={entry.id}
-                    className="flex items-baseline gap-3 px-4 py-2.5 rounded-xl hover:bg-purple-900/30 transition-colors group"
-                  >
-                    <span className="text-purple-300/30 text-xs shrink-0 w-28" dir="ltr">
-                      {dateStr} {timeStr}
-                    </span>
-                    <span className={`font-bold shrink-0 text-xs uppercase tracking-wide ${color}`}>
-                      [{entry.action}]
-                    </span>
-                    <span className="text-white/80 flex-1">{entry.details}</span>
-                    <span className="text-purple-300/30 text-xs shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                      by {entry.performedBy}
-                    </span>
-                  </div>
-                );
-              })}
+            {/* Code Changes — GitHub commits */}
+            <div className="bg-[#0d1117] rounded-2xl border border-blue-500/20 p-5">
+              <div className="flex items-center gap-2 mb-4 pb-3 border-b border-blue-500/10">
+                <span className="text-lg">💻</span>
+                <h3 className="font-bold text-blue-400 text-sm uppercase tracking-widest">Code Changes</h3>
+                <span className="mr-auto px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400/60 text-xs">GitHub</span>
+              </div>
+              {commits.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-3xl mb-2">📭</p>
+                  <p className="text-purple-300/30 text-xs">No commits fetched</p>
+                </div>
+              ) : (
+                <div className="space-y-1 font-mono text-xs">
+                  {commits.map((c) => {
+                    const msg = c.commit.message.split("\n")[0];
+                    const date = new Date(c.commit.author.date);
+                    const dateStr = date.toLocaleDateString("en-GB", {
+                      day: "2-digit", month: "short", year: "2-digit",
+                    });
+                    const timeStr = date.toLocaleTimeString("en-GB", {
+                      hour: "2-digit", minute: "2-digit",
+                    });
+                    const sha = c.sha.slice(0, 7);
+                    return (
+                      <a
+                        key={c.sha}
+                        href={c.html_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg hover:bg-blue-500/5 transition-colors group"
+                      >
+                        <span className="text-blue-500/40 shrink-0 mt-0.5">{sha}</span>
+                        <span className="text-white/70 flex-1 leading-snug group-hover:text-white transition-colors">{msg}</span>
+                        <span className="text-purple-300/25 shrink-0 text-right leading-snug" dir="ltr">
+                          {dateStr}<br />{timeStr}
+                        </span>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          )}
+
+            {/* In-Site Changes — audit log */}
+            <div className="bg-purple-900/20 rounded-2xl border border-amber-500/10 p-5">
+              <div className="flex items-center gap-2 mb-4 pb-3 border-b border-amber-500/10">
+                <span className="text-lg">⚙️</span>
+                <h3 className="font-bold text-amber-400 text-sm uppercase tracking-widest">In-Site Changes</h3>
+                <span className="mr-auto px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400/60 text-xs">Admin actions</span>
+              </div>
+              {recentLog.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-3xl mb-2">📭</p>
+                  <p className="text-purple-300/30 text-xs">No activity logged yet</p>
+                </div>
+              ) : (
+                <div className="space-y-1 font-mono text-xs">
+                  {recentLog.map((entry) => {
+                    const date = new Date(entry.timestamp);
+                    const dateStr = date.toLocaleDateString("en-GB", {
+                      day: "2-digit", month: "short", year: "2-digit",
+                    });
+                    const timeStr = date.toLocaleTimeString("en-GB", {
+                      hour: "2-digit", minute: "2-digit",
+                    });
+                    const actionColor: Record<string, string> = {
+                      "Role Changed": "text-amber-400",
+                      "Level Assigned": "text-blue-400",
+                      "User Deleted": "text-red-400",
+                      "Fine Issued": "text-orange-400",
+                      "Fine Removed": "text-green-400",
+                    };
+                    const color = actionColor[entry.action] ?? "text-purple-300";
+                    return (
+                      <div
+                        key={entry.id}
+                        className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg hover:bg-purple-900/30 transition-colors group"
+                      >
+                        <span className={`font-bold shrink-0 mt-0.5 ${color}`}>[{entry.action.split(" ")[0]}]</span>
+                        <span className="text-white/70 flex-1 leading-snug">{entry.details}</span>
+                        <div className="text-right shrink-0 leading-snug">
+                          <p className="text-purple-300/25" dir="ltr">{dateStr}<br />{timeStr}</p>
+                          <p className="text-purple-300/20 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">
+                            {entry.performedBy}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+          </div>
         </div>
 
       </div>
