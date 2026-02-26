@@ -227,6 +227,22 @@ export default async function AdminDashboard() {
                               عرض
                             </Link>
                           )}
+                          {role === "teacher" && (
+                            <Link
+                              href="/dashboard/teacher"
+                              className="px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                            >
+                              عرض
+                            </Link>
+                          )}
+                          {role === "graduate" && (
+                            <Link
+                              href="/dashboard/graduate"
+                              className="px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                            >
+                              عرض
+                            </Link>
+                          )}
                           {role !== "student" && role !== "admin" && (
                             <form
                               action={async () => {
