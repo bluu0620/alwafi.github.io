@@ -56,7 +56,8 @@ export default async function AdminPreviewPage({
   params: Promise<{ levelId: string }>;
 }) {
   const user = await currentUser();
-  if (!user || user.unsafeMetadata?.role !== "admin") redirect("/");
+  const previewRole = user?.unsafeMetadata?.role as string | undefined;
+  if (!user || (previewRole !== "admin" && previewRole !== "dev")) redirect("/");
 
   const { levelId } = await params;
   const levelData = LEVELS[levelId];

@@ -31,7 +31,7 @@ export function RoleSelect({
             setSelected(e.target.value);
             formRef.current?.requestSubmit();
           }}
-          className={`appearance-none h-7 text-xs border rounded-full px-3 pl-7 text-center focus:outline-none transition-colors cursor-pointer ${roleData.color}`}
+          className={`appearance-none h-7 text-xs border rounded-full px-4 pl-6 text-center focus:outline-none transition-colors cursor-pointer ${roleData.color}`}
         >
           {ROLES.map((r) => (
             <option key={r.value} value={r.value}>

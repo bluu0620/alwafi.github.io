@@ -9,7 +9,7 @@ export default async function TeacherDashboard() {
   if (!user) redirect("/");
 
   const role = user.unsafeMetadata?.role as string | undefined;
-  if (role !== "teacher" && role !== "admin") redirect("/dashboard");
+  if (role !== "teacher" && role !== "admin" && role !== "dev") redirect("/dashboard");
 
   // Load real student counts per level
   const client = await clerkClient();

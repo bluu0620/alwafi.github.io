@@ -35,7 +35,7 @@ export default async function GraduateDashboard() {
 
   if (!user) redirect("/");
   const role = user.unsafeMetadata?.role as string | undefined;
-  if (role !== "graduate" && role !== "admin") redirect("/dashboard");
+  if (role !== "graduate" && role !== "admin" && role !== "dev") redirect("/dashboard");
 
   const upcomingEvents = ACADEMIC_CALENDAR.filter(
     (e) => e.type !== "study" && getEventStatus(e.gregorian) !== "past"
