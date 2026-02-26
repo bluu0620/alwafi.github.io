@@ -11,8 +11,8 @@ export default function Home() {
         <Image
           src="/wafilogo.png"
           alt="شعار الوافي"
-          width={80}
-          height={80}
+          width={140}
+          height={140}
           className="rounded-3xl mx-auto mb-6"
         />
 
