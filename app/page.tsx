@@ -33,6 +33,12 @@ export default function Home() {
             >
               👨‍🏫 تسجيل كمعلم
             </Link>
+            <Link
+              href="/sign-up/graduate"
+              className="w-full py-4 bg-green-900/30 text-green-300 rounded-2xl font-bold text-lg border border-green-700/30 hover:bg-green-800/40 hover:border-green-500/40 transition-all duration-200"
+            >
+              🎖️ تسجيل كخريج
+            </Link>
             <SignInButton mode="modal">
               <button className="w-full py-4 text-purple-300/60 text-base font-medium hover:text-purple-300 transition-all duration-200">
                 لديك حساب؟ تسجيل الدخول
