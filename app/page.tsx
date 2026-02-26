@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, SignUpButton } from "@clerk/nextjs";
 
 export default function Home() {
   return (
@@ -21,18 +21,16 @@ export default function Home() {
 
         <SignedOut>
           <div className="flex flex-col gap-3">
-            <Link
-              href="/sign-up"
-              className="w-full py-4 bg-gradient-to-l from-amber-500 to-amber-600 text-[#0f0f1a] rounded-2xl font-bold text-lg shadow-xl shadow-amber-500/20 hover:shadow-amber-500/40 hover:opacity-95 transition-all duration-200"
-            >
-              إنشاء حساب
-            </Link>
-            <Link
-              href="/sign-in"
-              className="w-full py-4 bg-purple-900/40 text-purple-200 rounded-2xl font-bold text-lg border border-purple-700/40 hover:bg-purple-800/50 hover:border-purple-500/50 transition-all duration-200"
-            >
-              تسجيل الدخول
-            </Link>
+            <SignUpButton mode="modal">
+              <button className="w-full py-4 bg-gradient-to-l from-amber-500 to-amber-600 text-[#0f0f1a] rounded-2xl font-bold text-lg shadow-xl shadow-amber-500/20 hover:shadow-amber-500/40 hover:opacity-95 transition-all duration-200">
+                إنشاء حساب
+              </button>
+            </SignUpButton>
+            <SignInButton mode="modal">
+              <button className="w-full py-4 bg-purple-900/40 text-purple-200 rounded-2xl font-bold text-lg border border-purple-700/40 hover:bg-purple-800/50 hover:border-purple-500/50 transition-all duration-200">
+                تسجيل الدخول
+              </button>
+            </SignInButton>
           </div>
         </SignedOut>
 
