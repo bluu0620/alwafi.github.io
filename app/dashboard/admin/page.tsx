@@ -180,7 +180,7 @@ export default async function AdminDashboard() {
                               <select
                                 name="department"
                                 defaultValue={department}
-                                className="text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-lg px-2 py-1 focus:outline-none focus:border-amber-500/50"
+                                className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-lg px-2 focus:outline-none focus:border-amber-500/50"
                               >
                                 <option value="">— بدون قسم —</option>
                                 <option value="language">لغوي</option>
@@ -188,7 +188,7 @@ export default async function AdminDashboard() {
                               </select>
                               <button
                                 type="submit"
-                                className="px-2 py-1 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
+                                className="h-7 px-2.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
                               >
                                 حفظ
                               </button>
@@ -214,7 +214,7 @@ export default async function AdminDashboard() {
                               <select
                                 name="level"
                                 defaultValue={level}
-                                className="text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-lg px-2 py-1 focus:outline-none focus:border-amber-500/50 max-w-[120px]"
+                                className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-lg px-2 focus:outline-none focus:border-amber-500/50 max-w-[120px]"
                               >
                                 <option value="">— بدون مستوى —</option>
                                 <optgroup label="قسم اللغة العربية">
@@ -234,7 +234,7 @@ export default async function AdminDashboard() {
                               </select>
                               <button
                                 type="submit"
-                                className="px-2 py-1 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
+                                className="h-7 px-2.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
                               >
                                 حفظ
                               </button>
@@ -252,17 +252,35 @@ export default async function AdminDashboard() {
 
                       {/* Actions */}
                       <td className="p-4">
-                        <div className="flex items-center justify-center gap-2 flex-wrap">
+                        <div className="flex flex-col items-center gap-2">
+                          {/* Role select — top row */}
+                          {role !== "admin" && (
+                            <RoleSelect
+                              currentRole={role}
+                              currentDepartment={department}
+                              action={async (formData: FormData) => {
+                                "use server";
+                                const newRole = formData.get("role") as string;
+                                const newDept = formData.get("department") as string;
+                                await updateUserRole(u.id, newRole);
+                                if (newRole === "teacher" && newDept) {
+                                  await updateTeacherDepartment(u.id, newDept);
+                                }
+                              }}
+                            />
+                          )}
+                          {/* Action buttons — bottom row */}
+                          <div className="flex items-center gap-1.5 flex-wrap justify-center">
                           <Link
                             href={`/dashboard/profile/${u.id}`}
-                            className="px-3 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-500/30 transition"
+                            className="h-7 px-2.5 flex items-center rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-500/30 transition"
                           >
                             ملف
                           </Link>
                           {role === "student" && level && (
                             <Link
                               href={`/dashboard/admin/preview/${level}`}
-                              className="px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                              className="h-7 px-2.5 flex items-center rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
                             >
                               عرض
                             </Link>
@@ -270,7 +288,7 @@ export default async function AdminDashboard() {
                           {role === "teacher" && (
                             <Link
                               href="/dashboard/teacher"
-                              className="px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                              className="h-7 px-2.5 flex items-center rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
                             >
                               عرض
                             </Link>
@@ -278,20 +296,10 @@ export default async function AdminDashboard() {
                           {role === "graduate" && (
                             <Link
                               href="/dashboard/graduate"
-                              className="px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                              className="h-7 px-2.5 flex items-center rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
                             >
                               عرض
                             </Link>
-                          )}
-                          {role !== "admin" && (
-                            <RoleSelect
-                              currentRole={role}
-                              action={async (formData: FormData) => {
-                                "use server";
-                                const newRole = formData.get("role") as string;
-                                await updateUserRole(u.id, newRole);
-                              }}
-                            />
                           )}
                           {!isSelf && role !== "admin" && (
                             <form
@@ -302,12 +310,13 @@ export default async function AdminDashboard() {
                             >
                               <button
                                 type="submit"
-                                className="px-3 py-1.5 rounded-lg bg-red-900/30 border border-red-800/40 text-red-500 text-xs hover:bg-red-900/50 transition"
+                                className="h-7 px-2.5 rounded-lg bg-red-900/30 border border-red-800/40 text-red-500 text-xs hover:bg-red-900/50 transition"
                               >
                                 حذف
                               </button>
                             </form>
                           )}
+                          </div>
                         </div>
                       </td>
                     </tr>
