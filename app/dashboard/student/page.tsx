@@ -98,14 +98,6 @@ export default async function StudentDashboard() {
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <QuickStat icon="📚" label="المواد" value={String(levelData.subjects.length)} />
-          <QuickStat icon="👨‍🏫" label="رائد الفصل" value={levelData.leader || "—"} small />
-          <QuickStat icon="📅" label="الفصل" value={PROGRAM_INFO.semester} small />
-          <QuickStat icon={isArabic ? "📖" : "🕌"} label="القسم" value={isArabic ? "عربي" : "شرعي"} />
-        </div>
-
         <div className="grid lg:grid-cols-3 gap-6 mb-6">
 
           {/* Subjects Section */}
@@ -282,35 +274,6 @@ export default async function StudentDashboard() {
   );
 }
 
-function QuickStat({
-  icon,
-  label,
-  value,
-  highlight = false,
-  small = false,
-}: {
-  icon: string;
-  label: string;
-  value: string;
-  highlight?: boolean;
-  small?: boolean;
-}) {
-  return (
-    <div className={`bg-purple-900/20 rounded-2xl p-5 border hover-lift ${highlight ? "border-amber-500/40 shadow-md shadow-amber-500/10" : "border-amber-500/10"}`}>
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xl shrink-0">
-          {icon}
-        </div>
-        <div className="min-w-0">
-          <p className={`font-bold truncate ${highlight ? "text-amber-400" : "text-white"} ${small ? "text-sm" : "text-2xl"}`}>
-            {value}
-          </p>
-          <p className="text-sm text-purple-300/60">{label}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function ScheduleCard({
   title,

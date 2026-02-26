@@ -25,15 +25,6 @@ export default async function AdminDashboard() {
   const client = await clerkClient();
   const { data: users } = await client.users.getUserList({ limit: 100 });
 
-  const counts = users.reduce(
-    (acc, u) => {
-      const role = (u.unsafeMetadata?.role as string) || "none";
-      acc[role] = (acc[role] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
-
   return (
     <div className="min-h-[calc(100vh-80px)] p-6">
       <div className="max-w-7xl mx-auto">
@@ -51,14 +42,6 @@ export default async function AdminDashboard() {
               <p className="text-purple-300/60">التحكم الكامل في الحسابات - برنامج الوافي</p>
             </div>
           </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <StatCard icon="👥" label="إجمالي الحسابات" value={String(users.length)} />
-          <StatCard icon="🛡️" label="المدراء" value={String(counts["admin"] || 0)} color="red" />
-          <StatCard icon="👨‍🏫" label="المعلمون" value={String(counts["teacher"] || 0)} color="amber" />
-          <StatCard icon="🎓" label="الطلاب" value={String(counts["student"] || 0)} color="purple" />
         </div>
 
         {/* Users Table */}

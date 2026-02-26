@@ -53,14 +53,6 @@ export default async function TeacherDashboard() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <QuickStat icon="👨‍🎓" label="إجمالي الطلاب" value="٨٣" />
-          <QuickStat icon="📚" label="الصفوف" value="٣" highlight />
-          <QuickStat icon="📝" label="واجبات معلقة" value="٤" />
-          <QuickStat icon="📅" label="حصص اليوم" value="٥" />
-        </div>
-
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Today's Schedule */}
           <div className="lg:col-span-2 bg-purple-900/20 rounded-2xl border border-amber-500/10 p-6">
@@ -210,28 +202,3 @@ export default async function TeacherDashboard() {
   );
 }
 
-function QuickStat({
-  icon,
-  label,
-  value,
-  highlight = false,
-}: {
-  icon: string;
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div className={`bg-purple-900/20 rounded-2xl p-5 border hover-lift ${highlight ? "border-amber-500/40 shadow-md shadow-amber-500/10" : "border-amber-500/10"}`}>
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xl">
-          {icon}
-        </div>
-        <div>
-          <p className={`text-2xl font-bold ${highlight ? "text-amber-400" : "text-white"}`}>{value}</p>
-          <p className="text-sm text-purple-300/60">{label}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
