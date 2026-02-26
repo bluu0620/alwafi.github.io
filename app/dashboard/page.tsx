@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   const role = user.unsafeMetadata?.role as string;
   const level = user.unsafeMetadata?.level as string | undefined;
 
-  if (role === "admin") {
+  if (role === "admin" || role === "dev") {
     redirect("/dashboard/admin");
   } else if (role === "teacher") {
     redirect("/dashboard/teacher");

@@ -9,6 +9,7 @@ import { RoleSelect } from "./RoleSelect";
 import { AutoSaveSelect } from "./AutoSaveSelect";
 
 const ROLE_LABELS: Record<string, string> = {
+  dev: "Dev",
   admin: "مدير",
   teacher: "معلم",
   student: "طالب",
@@ -16,55 +17,67 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const ROLE_COLORS: Record<string, string> = {
+  dev: "bg-cyan-500/20 border-cyan-500/40 text-cyan-300",
   admin: "bg-red-500/20 border-red-500/40 text-red-400",
   teacher: "bg-amber-500/20 border-amber-500/40 text-amber-400",
   student: "bg-purple-500/20 border-purple-500/40 text-purple-300",
   graduate: "bg-green-500/20 border-green-500/40 text-green-400",
 };
 
+const ROLE_ORDER: Record<string, number> = {
+  dev: 0, admin: 1, teacher: 2, graduate: 3, student: 4,
+};
+
 export default async function AdminDashboard() {
   const user = await currentUser();
 
-  if (!user || user.unsafeMetadata?.role !== "admin") {
+  const viewerRole = user?.unsafeMetadata?.role as string;
+  if (!user || (viewerRole !== "admin" && viewerRole !== "dev")) {
     redirect("/");
   }
+  const isDev = viewerRole === "dev";
 
   const client = await clerkClient();
-  const { data: users } = await client.users.getUserList({ limit: 100 });
+  const { data: rawUsers } = await client.users.getUserList({ limit: 100 });
+  const users = [...rawUsers].sort((a, b) => {
+    const ra = (a.unsafeMetadata?.role as string) || "none";
+    const rb = (b.unsafeMetadata?.role as string) || "none";
+    return (ROLE_ORDER[ra] ?? 5) - (ROLE_ORDER[rb] ?? 5);
+  });
   const levelsConfig = await getLevelsConfig();
   const mergedLevels = getAllMergedLevels(levelsConfig);
 
-  // Aggregate in-site audit log from all users' metadata
-  const auditLog: AuditEntry[] = [];
-  for (const u of users) {
-    const log = (u.unsafeMetadata?.actionLog as AuditEntry[] | undefined) ?? [];
-    auditLog.push(...log);
-  }
-  auditLog.sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-  );
-  const recentLog = auditLog.slice(0, 50);
-
-  // Fetch recent GitHub commits (code changes)
+  // Aggregate in-site audit log — dev only
   type GitCommit = {
     sha: string;
-    commit: {
-      message: string;
-      author: { name: string; date: string };
-    };
+    commit: { message: string; author: { name: string; date: string } };
     html_url: string;
   };
+  let recentLog: AuditEntry[] = [];
   let commits: GitCommit[] = [];
-  try {
-    const headers: Record<string, string> = { "User-Agent": "wafi-admin" };
-    if (process.env.GITHUB_TOKEN) headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
-    const res = await fetch(
-      "https://api.github.com/repos/bluu0620/alwafi.github.io/commits?per_page=30",
-      { headers, next: { revalidate: 60 } }
+
+  if (isDev) {
+    const auditLog: AuditEntry[] = [];
+    for (const u of users) {
+      const log = (u.unsafeMetadata?.actionLog as AuditEntry[] | undefined) ?? [];
+      auditLog.push(...log);
+    }
+    auditLog.sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
-    if (res.ok) commits = await res.json();
-  } catch {
-    // GitHub API unavailable — skip silently
+    recentLog = auditLog.slice(0, 50);
+
+    try {
+      const headers: Record<string, string> = { "User-Agent": "wafi-admin" };
+      if (process.env.GITHUB_TOKEN) headers["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
+      const res = await fetch(
+        "https://api.github.com/repos/bluu0620/alwafi.github.io/commits?per_page=30",
+        { headers, next: { revalidate: 60 } }
+      );
+      if (res.ok) commits = await res.json();
+    } catch {
+      // GitHub API unavailable — skip silently
+    }
   }
 
   return (
@@ -147,9 +160,9 @@ export default async function AdminDashboard() {
                         {email}
                       </td>
 
-                      {/* Role — dropdown or badge for admin */}
+                      {/* Role — dropdown or badge */}
                       <td className="p-4 text-center">
-                        {role !== "admin" ? (
+                        {!isSelf && (isDev || (role !== "admin" && role !== "dev")) ? (
                           <RoleSelect
                             currentRole={role}
                             action={async (formData: FormData) => {
@@ -159,8 +172,8 @@ export default async function AdminDashboard() {
                             }}
                           />
                         ) : (
-                          <span className={`inline-block px-3 py-1 rounded-full border text-xs font-bold ${ROLE_COLORS.admin}`}>
-                            مدير
+                          <span className={`inline-block px-3 py-1 rounded-full border text-xs font-bold ${ROLE_COLORS[role] ?? "bg-purple-500/20 border-purple-500/40 text-purple-300"}`}>
+                            {ROLE_LABELS[role] ?? role}
                           </span>
                         )}
                       </td>
@@ -248,7 +261,7 @@ export default async function AdminDashboard() {
                               عرض
                             </Link>
                           )}
-                          {!isSelf && role !== "admin" && (
+                          {!isSelf && (isDev ? role !== "dev" : role !== "admin" && role !== "dev") && (
                             <form
                               action={async () => {
                                 "use server";
@@ -332,8 +345,8 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {/* Channel Log */}
-        <div className="mt-8">
+        {/* Channel Log — dev only */}
+        {isDev && <div className="mt-8">
           <div className="flex items-center gap-4 mb-4">
             <span className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-lg">🗒️</span>
             <div>
@@ -440,7 +453,7 @@ export default async function AdminDashboard() {
             </div>
 
           </div>
-        </div>
+        </div>}
 
       </div>
     </div>

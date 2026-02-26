@@ -8,7 +8,8 @@ import { logAuditEvent } from "@/lib/audit-log";
 
 async function requireAdmin() {
   const user = await currentUser();
-  if (!user || user.unsafeMetadata?.role !== "admin") {
+  const role = user?.unsafeMetadata?.role;
+  if (!user || (role !== "admin" && role !== "dev")) {
     redirect("/");
   }
   return user;
@@ -27,6 +28,7 @@ function userName(u: { firstName: string | null; lastName: string | null; emailA
 }
 
 const ROLE_LABELS_EN: Record<string, string> = {
+  dev: "Dev",
   admin: "Admin",
   teacher: "Teacher",
   student: "Student",
