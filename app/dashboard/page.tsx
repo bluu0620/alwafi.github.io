@@ -20,6 +20,8 @@ export default async function DashboardPage() {
       redirect("/onboarding");
     }
     redirect("/dashboard/student");
+  } else if (role === "graduate") {
+    redirect("/dashboard/graduate");
   } else {
     // No role assigned yet — send back to home
     redirect("/");

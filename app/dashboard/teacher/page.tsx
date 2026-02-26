@@ -1,5 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 const SAMPLE_COURSES = [
   { name: "فيلر", class: "الصف الثالث أ", students: 28, icon: "📐" },
@@ -51,6 +52,25 @@ export default async function TeacherDashboard() {
               <p className="text-purple-300/60">لوحة تحكم المعلم - برنامج الوافي</p>
             </div>
           </div>
+        </div>
+
+        {/* Fines Banner */}
+        <div className="mb-6 bg-red-900/20 rounded-2xl border border-red-500/20 p-5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-2xl shrink-0">
+              ⚠️
+            </div>
+            <div>
+              <p className="font-bold text-white text-lg">الغرامات</p>
+              <p className="text-sm text-purple-300/60">سجل غرامات على الطلاب لمخالفة قواعد البرنامج</p>
+            </div>
+          </div>
+          <Link
+            href="/dashboard/fines"
+            className="shrink-0 px-5 py-2.5 rounded-xl bg-gradient-to-l from-red-500 to-red-600 text-white font-bold text-sm hover:opacity-90 transition shadow-lg shadow-red-500/20"
+          >
+            سجل غرامة
+          </Link>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">

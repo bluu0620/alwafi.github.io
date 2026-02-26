@@ -8,12 +8,14 @@ const ROLE_LABELS: Record<string, string> = {
   admin: "مدير",
   teacher: "معلم",
   student: "طالب",
+  graduate: "خريج",
 };
 
 const ROLE_COLORS: Record<string, string> = {
   admin: "bg-red-500/20 border-red-500/40 text-red-400",
   teacher: "bg-amber-500/20 border-amber-500/40 text-amber-400",
   student: "bg-purple-500/20 border-purple-500/40 text-purple-300",
+  graduate: "bg-green-500/20 border-green-500/40 text-green-400",
 };
 
 export default async function AdminDashboard() {
@@ -177,6 +179,12 @@ export default async function AdminDashboard() {
                       {/* Actions */}
                       <td className="p-4">
                         <div className="flex items-center justify-center gap-2 flex-wrap">
+                          <Link
+                            href={`/dashboard/profile/${u.id}`}
+                            className="px-3 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-500/30 transition"
+                          >
+                            ملف
+                          </Link>
                           {role === "student" && level && (
                             <Link
                               href={`/dashboard/admin/preview/${level}`}
@@ -212,6 +220,21 @@ export default async function AdminDashboard() {
                                 className="px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
                               >
                                 معلم
+                              </button>
+                            </form>
+                          )}
+                          {role !== "graduate" && role !== "admin" && (
+                            <form
+                              action={async () => {
+                                "use server";
+                                await updateUserRole(u.id, "graduate");
+                              }}
+                            >
+                              <button
+                                type="submit"
+                                className="px-3 py-1.5 rounded-lg bg-green-500/20 border border-green-500/30 text-green-400 text-xs hover:bg-green-500/30 transition"
+                              >
+                                خريج
                               </button>
                             </form>
                           )}
