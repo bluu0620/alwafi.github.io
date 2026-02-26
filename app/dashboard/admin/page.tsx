@@ -1,5 +1,6 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { updateUserRole, deleteUser, updateStudentLevel } from "./actions";
 import { LEVELS, ARABIC_LEVELS, ISLAMIC_LEVELS } from "@/lib/program-data";
 
@@ -176,7 +177,15 @@ export default async function AdminDashboard() {
                       {/* Actions */}
                       <td className="p-4">
                         <div className="flex items-center justify-center gap-2 flex-wrap">
-                          {role !== "student" && (
+                          {role === "student" && level && (
+                            <Link
+                              href={`/dashboard/admin/preview/${level}`}
+                              className="px-3 py-1.5 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                            >
+                              عرض
+                            </Link>
+                          )}
+                          {role !== "student" && role !== "admin" && (
                             <form
                               action={async () => {
                                 "use server";
@@ -191,7 +200,7 @@ export default async function AdminDashboard() {
                               </button>
                             </form>
                           )}
-                          {role !== "teacher" && (
+                          {role !== "teacher" && role !== "admin" && (
                             <form
                               action={async () => {
                                 "use server";
@@ -221,7 +230,7 @@ export default async function AdminDashboard() {
                               </button>
                             </form>
                           )}
-                          {!isSelf && (
+                          {!isSelf && role !== "admin" && (
                             <form
                               action={async () => {
                                 "use server";
@@ -258,16 +267,17 @@ export default async function AdminDashboard() {
                 (u) => u.unsafeMetadata?.level === lvl.id
               ).length;
               return (
-                <div
+                <Link
                   key={lvl.id}
-                  className="bg-purple-900/30 rounded-xl p-4 border border-purple-800/30 text-center"
+                  href={`/dashboard/admin/preview/${lvl.id}`}
+                  className="bg-purple-900/30 rounded-xl p-4 border border-purple-800/30 text-center hover:border-amber-500/30 hover:bg-purple-900/50 transition-colors"
                 >
                   <p className="text-2xl font-bold text-amber-400">{count}</p>
                   <p className="text-sm text-white font-medium mt-1">{lvl.name}</p>
                   <p className="text-xs text-purple-300/50 mt-0.5">
                     {lvl.department === "arabic" ? "عربي" : "شرعي"}
                   </p>
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -278,42 +288,3 @@ export default async function AdminDashboard() {
   );
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-  color = "default",
-}: {
-  icon: string;
-  label: string;
-  value: string;
-  color?: "red" | "amber" | "purple" | "default";
-}) {
-  const borderClass = {
-    red: "border-red-500/40 shadow-red-500/10",
-    amber: "border-amber-500/40 shadow-amber-500/10",
-    purple: "border-purple-500/40",
-    default: "border-amber-500/10",
-  }[color];
-
-  const textClass = {
-    red: "text-red-400",
-    amber: "text-amber-400",
-    purple: "text-purple-300",
-    default: "text-white",
-  }[color];
-
-  return (
-    <div className={`bg-purple-900/20 rounded-2xl p-5 border hover-lift ${borderClass}`}>
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xl">
-          {icon}
-        </div>
-        <div>
-          <p className={`text-2xl font-bold ${textClass}`}>{value}</p>
-          <p className="text-sm text-purple-300/60">{label}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
