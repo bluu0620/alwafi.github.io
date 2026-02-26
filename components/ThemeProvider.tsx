@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState } from "react";
 
-export type ThemeName = "night" | "coral" | "emerald" | "sky" | "indigo";
+export type ThemeName = "solar" | "earth" | "arctic" | "neon" | "pastel";
 export type ThemeMode = "dark" | "light";
 
 interface ThemeCtx {
@@ -13,7 +13,7 @@ interface ThemeCtx {
 }
 
 const Ctx = createContext<ThemeCtx>({
-  theme: "night",
+  theme: "solar",
   mode: "dark",
   setTheme: () => {},
   toggleMode: () => {},
@@ -25,7 +25,7 @@ function setCookie(name: string, value: string) {
 
 export function ThemeProvider({
   children,
-  initialTheme = "night",
+  initialTheme = "solar",
   initialMode = "dark",
 }: {
   children: React.ReactNode;

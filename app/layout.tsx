@@ -33,7 +33,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const initialTheme = (cookieStore.get("wafi-theme")?.value ?? "night") as ThemeName;
+  const initialTheme = (cookieStore.get("wafi-theme")?.value ?? "solar") as ThemeName;
   const initialMode = (cookieStore.get("wafi-mode")?.value ?? "dark") as ThemeMode;
 
   return (
@@ -44,11 +44,14 @@ export default async function RootLayout({
             <ThemeWrapper>
               {/* Ambient background */}
               <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-purple-900/20 rounded-full blur-[150px]" />
-                <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-amber-900/10 rounded-full blur-[120px]" />
+                <div className="absolute top-0 left-1/4 w-[800px] h-[800px] rounded-full blur-[150px]"
+                  style={{ backgroundColor: "var(--accent)", opacity: 0.12 }} />
+                <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] rounded-full blur-[120px]"
+                  style={{ backgroundColor: "var(--cta)", opacity: 0.08 }} />
               </div>
 
-              <header className="sticky top-0 z-50 backdrop-blur-2xl bg-[#0f0f1a]/80 border-b border-amber-500/10">
+              <header className="sticky top-0 z-50 backdrop-blur-2xl border-b"
+                style={{ backgroundColor: "color-mix(in srgb, var(--bg-page) 80%, transparent)", borderColor: "var(--border-accent)" }}>
                 <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
                   <Link href="/" className="flex items-center gap-3 group">
                     <Image

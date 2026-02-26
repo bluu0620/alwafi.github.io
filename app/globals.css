@@ -5,10 +5,78 @@
   --color-gold: #f59e0b;
 }
 
-/* Light mode: re-invert images so they display correctly (CSS filter double-inversion) */
-.theme-root[data-mode="light"] img,
-.theme-root[data-mode="light"] video {
-  filter: invert(1) hue-rotate(180deg);
+/* ====== THEME-AWARE OVERRIDES ====== */
+/* The .theme-root div has CSS custom properties set inline by ThemeWrapper.
+   These rules override hardcoded Tailwind color classes inside that div. */
+
+/* --- Card / panel backgrounds (purple-tinted panels become --bg-card) --- */
+.theme-root [class*="bg-purple-900"] {
+  background-color: var(--bg-card) !important;
+}
+.theme-root [class*="bg-purple-800"] {
+  background-color: var(--bg-card-2) !important;
+}
+
+/* --- Accent text (amber) → --accent --- */
+.theme-root [class*="text-amber"] {
+  color: var(--accent) !important;
+}
+.theme-root [class*="text-yellow"] {
+  color: var(--accent) !important;
+}
+
+/* --- Muted/secondary text (purple-300, purple-400) → --text-muted --- */
+.theme-root [class*="text-purple-3"],
+.theme-root [class*="text-purple-4"] {
+  color: var(--text-muted) !important;
+}
+.theme-root [class*="text-purple-2"] {
+  color: var(--text-muted) !important;
+}
+
+/* --- White text in light mode → --text-bright --- */
+.theme-root[data-mode="light"] .text-white {
+  color: var(--text-bright) !important;
+}
+
+/* --- Accent borders (amber) → --border-accent --- */
+.theme-root [class*="border-amber"] {
+  border-color: var(--border-accent) !important;
+}
+
+/* --- Subtle borders (purple) → --border --- */
+.theme-root [class*="border-purple"] {
+  border-color: var(--border) !important;
+}
+
+/* --- Accent low-opacity backgrounds (chips, tags) → color-mix with --accent --- */
+.theme-root [class*="bg-amber"] {
+  background-color: color-mix(in srgb, var(--accent) 15%, transparent) !important;
+}
+
+/* --- CTA gradient buttons → use --cta as solid color --- */
+.theme-root [class*="from-amber-5"],
+.theme-root [class*="from-amber-4"] {
+  --tw-gradient-from: var(--cta) !important;
+  background-image: linear-gradient(to left, color-mix(in srgb, var(--cta) 80%, #000), var(--cta)) !important;
+}
+
+/* --- Red/destructive elements keep their color (don't override) --- */
+
+/* --- Green success elements keep their color --- */
+
+/* Light mode: header and fixed overlays */
+.theme-root[data-mode="light"] [class*="bg-red-9"] {
+  background-color: color-mix(in srgb, #dc2626 15%, transparent) !important;
+}
+.theme-root[data-mode="light"] [class*="text-red-4"] {
+  color: #dc2626 !important;
+}
+.theme-root[data-mode="light"] [class*="border-red-8"] {
+  border-color: rgba(220, 38, 38, 0.3) !important;
+}
+.theme-root[data-mode="light"] [class*="text-green-4"] {
+  color: #16a34a !important;
 }
 
 @theme inline {
