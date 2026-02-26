@@ -10,6 +10,7 @@ import { arSA } from "@clerk/localizations";
 import { Cairo } from "next/font/google";
 import Link from "next/link";
 import Image from "next/image";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const cairo = Cairo({
@@ -80,6 +81,7 @@ export default function RootLayout({
           <div className="relative">
             {children}
           </div>
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
