@@ -35,6 +35,8 @@ export default async function TeacherDashboard() {
     redirect("/");
   }
 
+  const department = user.unsafeMetadata?.department as string | undefined;
+
   return (
     <div className="min-h-[calc(100vh-80px)] p-6">
       <div className="max-w-7xl mx-auto">
@@ -49,7 +51,18 @@ export default async function TeacherDashboard() {
               <h1 className="text-3xl font-bold bg-gradient-to-l from-amber-400 to-amber-300 bg-clip-text text-transparent">
                 مرحباً، {user.firstName || "معلم"}
               </h1>
-              <p className="text-purple-300/60">لوحة تحكم المعلم - برنامج الوافي</p>
+              <div className="flex items-center gap-3 mt-1">
+                <p className="text-purple-300/60">لوحة تحكم المعلم - برنامج الوافي</p>
+                {department && (
+                  <span className={`px-3 py-0.5 rounded-full text-xs font-bold border ${
+                    department === "language"
+                      ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                      : "bg-blue-500/10 border-blue-500/30 text-blue-400"
+                  }`}>
+                    {department === "language" ? "لغوي" : "شرعي"}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>

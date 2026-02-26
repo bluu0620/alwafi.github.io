@@ -75,6 +75,29 @@ export async function updateStudentLevel(userId: string, level: string) {
   revalidatePath("/dashboard/admin");
 }
 
+export async function updateTeacherDepartment(userId: string, department: string) {
+  const admin = await requireAdmin();
+  if (department && !["language", "sharia"].includes(department)) {
+    throw new Error("قسم غير صالح");
+  }
+  const client = await clerkClient();
+  const existingUser = await client.users.getUser(userId);
+  await client.users.updateUser(userId, {
+    unsafeMetadata: {
+      ...existingUser.unsafeMetadata,
+      department: department || undefined,
+    },
+  });
+  const deptLabel = department === "language" ? "لغوي" : department === "sharia" ? "شرعي" : "None";
+  await logAuditEvent(
+    admin.id,
+    adminName(admin),
+    "Dept Assigned",
+    `${userName(existingUser)} → ${deptLabel}`
+  );
+  revalidatePath("/dashboard/admin");
+}
+
 export async function deleteUser(userId: string) {
   const admin = await requireAdmin();
   const client = await clerkClient();

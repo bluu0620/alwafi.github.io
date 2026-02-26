@@ -1,9 +1,10 @@
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { updateUserRole, deleteUser, updateStudentLevel } from "./actions";
+import { updateUserRole, deleteUser, updateStudentLevel, updateTeacherDepartment } from "./actions";
 import { LEVELS, ARABIC_LEVELS, ISLAMIC_LEVELS } from "@/lib/program-data";
 import { type AuditEntry } from "@/lib/audit-log";
+import { RoleSelect } from "./RoleSelect";
 
 const ROLE_LABELS: Record<string, string> = {
   admin: "مدير",
@@ -95,7 +96,7 @@ export default async function AdminDashboard() {
                   <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40 rounded-r-xl">المستخدم</th>
                   <th className="p-4 text-right font-bold text-amber-400/70 bg-purple-900/40">البريد</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">الدور</th>
-                  <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">المستوى</th>
+                  <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">القسم / المستوى</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40">تاريخ الإنشاء</th>
                   <th className="p-4 text-center font-bold text-amber-400/70 bg-purple-900/40 rounded-l-xl">الإجراءات</th>
                 </tr>
@@ -105,6 +106,7 @@ export default async function AdminDashboard() {
                   const role = (u.unsafeMetadata?.role as string) || "none";
                   const level = (u.unsafeMetadata?.level as string) || "";
                   const levelData = level ? LEVELS[level] : null;
+                  const department = (u.unsafeMetadata?.department as string) || "";
                   const initials =
                     ((u.firstName?.[0] || "") + (u.lastName?.[0] || "")) ||
                     u.emailAddresses[0]?.emailAddress?.[0]?.toUpperCase() ||
@@ -152,9 +154,47 @@ export default async function AdminDashboard() {
                         </span>
                       </td>
 
-                      {/* Level Badge / Assignment */}
+                      {/* Level / Department */}
                       <td className="p-4 text-center">
-                        {role === "student" ? (
+                        {role === "teacher" ? (
+                          <div className="flex flex-col items-center gap-2">
+                            {department ? (
+                              <span className={`inline-block px-2 py-1 rounded-full text-xs font-bold border ${
+                                department === "language"
+                                  ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                                  : "bg-blue-500/10 border-blue-500/30 text-blue-400"
+                              }`}>
+                                {department === "language" ? "لغوي" : "شرعي"}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-purple-300/40">غير محدد</span>
+                            )}
+                            <form
+                              action={async (formData: FormData) => {
+                                "use server";
+                                const newDept = formData.get("department") as string;
+                                await updateTeacherDepartment(u.id, newDept);
+                              }}
+                              className="flex items-center gap-1"
+                            >
+                              <select
+                                name="department"
+                                defaultValue={department}
+                                className="text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-lg px-2 py-1 focus:outline-none focus:border-amber-500/50"
+                              >
+                                <option value="">— بدون قسم —</option>
+                                <option value="language">لغوي</option>
+                                <option value="sharia">شرعي</option>
+                              </select>
+                              <button
+                                type="submit"
+                                className="px-2 py-1 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
+                              >
+                                حفظ
+                              </button>
+                            </form>
+                          </div>
+                        ) : role === "student" ? (
                           <div className="flex flex-col items-center gap-2">
                             {levelData ? (
                               <span className="inline-block px-2 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
@@ -243,65 +283,15 @@ export default async function AdminDashboard() {
                               عرض
                             </Link>
                           )}
-                          {role !== "student" && role !== "admin" && (
-                            <form
-                              action={async () => {
-                                "use server";
-                                await updateUserRole(u.id, "student");
-                              }}
-                            >
-                              <button
-                                type="submit"
-                                className="px-3 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-500/30 transition"
-                              >
-                                طالب
-                              </button>
-                            </form>
-                          )}
-                          {role !== "teacher" && role !== "admin" && (
-                            <form
-                              action={async () => {
-                                "use server";
-                                await updateUserRole(u.id, "teacher");
-                              }}
-                            >
-                              <button
-                                type="submit"
-                                className="px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs hover:bg-amber-500/30 transition"
-                              >
-                                معلم
-                              </button>
-                            </form>
-                          )}
-                          {role !== "graduate" && role !== "admin" && (
-                            <form
-                              action={async () => {
-                                "use server";
-                                await updateUserRole(u.id, "graduate");
-                              }}
-                            >
-                              <button
-                                type="submit"
-                                className="px-3 py-1.5 rounded-lg bg-green-500/20 border border-green-500/30 text-green-400 text-xs hover:bg-green-500/30 transition"
-                              >
-                                خريج
-                              </button>
-                            </form>
-                          )}
                           {role !== "admin" && (
-                            <form
-                              action={async () => {
+                            <RoleSelect
+                              currentRole={role}
+                              action={async (formData: FormData) => {
                                 "use server";
-                                await updateUserRole(u.id, "admin");
+                                const newRole = formData.get("role") as string;
+                                await updateUserRole(u.id, newRole);
                               }}
-                            >
-                              <button
-                                type="submit"
-                                className="px-3 py-1.5 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-xs hover:bg-red-500/30 transition"
-                              >
-                                مدير
-                              </button>
-                            </form>
+                            />
                           )}
                           {!isSelf && role !== "admin" && (
                             <form
@@ -437,6 +427,7 @@ export default async function AdminDashboard() {
                     const actionColor: Record<string, string> = {
                       "Role Changed": "text-amber-400",
                       "Level Assigned": "text-blue-400",
+                      "Dept Assigned": "text-cyan-400",
                       "User Deleted": "text-red-400",
                       "Fine Issued": "text-orange-400",
                       "Fine Removed": "text-green-400",
