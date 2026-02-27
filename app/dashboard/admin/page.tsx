@@ -186,14 +186,7 @@ export default async function AdminDashboard() {
                         {role === "teacher" ? (
                           <span className="text-xs text-purple-300/30">—</span>
                         ) : role === "student" ? (
-                          <div className="flex flex-col items-center gap-2">
-                            {levelData ? (
-                              <span className="inline-block px-2 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
-                                {levelData.shortName}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-purple-300/40">غير محدد</span>
-                            )}
+                          <div className="flex items-center gap-2 justify-center">
                             <AutoSaveSelect
                               name="level"
                               defaultValue={level}
@@ -220,6 +213,11 @@ export default async function AdminDashboard() {
                                 ))}
                               </optgroup>
                             </AutoSaveSelect>
+                            {levelData && (
+                              <span className="px-2 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold shrink-0">
+                                {levelData.shortName}
+                              </span>
+                            )}
                           </div>
                         ) : (
                           <span className="text-xs text-purple-300/30">—</span>
