@@ -19,11 +19,11 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 const ROLE_COLORS: Record<string, string> = {
-  dev: "bg-cyan-500/20 border-cyan-500/40 text-cyan-300",
-  admin: "bg-red-500/20 border-red-500/40 text-red-400",
-  teacher: "bg-amber-500/20 border-amber-500/40 text-amber-400",
-  student: "bg-purple-500/20 border-purple-500/40 text-purple-300",
-  graduate: "bg-green-500/20 border-green-500/40 text-green-400",
+  dev: "bg-cyan-500/20 border-cyan-500/40 text-cyan-600",
+  admin: "bg-red-500/20 border-red-500/40 text-red-500",
+  teacher: "bg-amber-500/20 border-amber-500/40 text-amber-600",
+  student: "bg-purple-500/20 border-purple-500/40 text-purple-600",
+  graduate: "bg-green-500/20 border-green-500/40 text-green-600",
 };
 
 const ROLE_ORDER: Record<string, number> = {
@@ -240,7 +240,7 @@ export default async function AdminDashboard() {
                           {role === "student" && level && (
                             <Link
                               href={`/dashboard/admin/preview/${level}`}
-                              className="h-7 px-2.5 flex items-center rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                              className="h-7 px-2.5 flex items-center rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-600 text-xs hover:bg-blue-500/30 transition"
                             >
                               عرض
                             </Link>
@@ -248,7 +248,7 @@ export default async function AdminDashboard() {
                           {role === "teacher" && (
                             <Link
                               href="/dashboard/teacher"
-                              className="h-7 px-2.5 flex items-center rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                              className="h-7 px-2.5 flex items-center rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-600 text-xs hover:bg-blue-500/30 transition"
                             >
                               عرض
                             </Link>
@@ -256,7 +256,7 @@ export default async function AdminDashboard() {
                           {role === "graduate" && (
                             <Link
                               href="/dashboard/graduate"
-                              className="h-7 px-2.5 flex items-center rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs hover:bg-blue-500/30 transition"
+                              className="h-7 px-2.5 flex items-center rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-600 text-xs hover:bg-blue-500/30 transition"
                             >
                               عرض
                             </Link>
@@ -477,16 +477,16 @@ export default async function AdminDashboard() {
           <div className="grid lg:grid-cols-2 gap-6">
 
             {/* Code Changes — GitHub commits */}
-            <div className="bg-[#0d1117] rounded-2xl border border-blue-500/20 p-5">
+            <div className="rounded-2xl border border-blue-500/20 p-5" style={{ backgroundColor: "var(--bg-card-2)" }}>
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-blue-500/10">
                 <span className="text-lg">💻</span>
-                <h3 className="font-bold text-blue-400 text-sm uppercase tracking-widest">Code Changes</h3>
-                <span className="mr-auto px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400/60 text-xs">GitHub</span>
+                <h3 className="font-bold text-blue-500 text-sm uppercase tracking-widest">Code Changes</h3>
+                <span className="mr-auto px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500/70 text-xs">GitHub</span>
               </div>
               {commits.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-3xl mb-2">📭</p>
-                  <p className="text-purple-300/30 text-xs">No commits fetched</p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>No commits fetched</p>
                 </div>
               ) : (
                 <div className="space-y-1 font-mono text-xs">
@@ -508,9 +508,9 @@ export default async function AdminDashboard() {
                         rel="noopener noreferrer"
                         className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg hover:bg-blue-500/5 transition-colors group"
                       >
-                        <span className="text-blue-500/40 shrink-0 mt-0.5">{sha}</span>
-                        <span className="text-white/70 flex-1 leading-snug group-hover:text-white transition-colors">{msg}</span>
-                        <span className="text-purple-300/25 shrink-0 text-right leading-snug" dir="ltr">
+                        <span className="text-blue-500/60 shrink-0 mt-0.5">{sha}</span>
+                        <span className="flex-1 leading-snug" style={{ color: "var(--text-bright)" }}>{msg}</span>
+                        <span className="shrink-0 text-right leading-snug" style={{ color: "var(--text-muted)" }} dir="ltr">
                           {dateStr}<br />{timeStr}
                         </span>
                       </a>
@@ -543,24 +543,24 @@ export default async function AdminDashboard() {
                       hour: "2-digit", minute: "2-digit",
                     });
                     const actionColor: Record<string, string> = {
-                      "Role Changed": "text-amber-400",
-                      "Level Assigned": "text-blue-400",
-                      "Dept Assigned": "text-cyan-400",
-                      "User Deleted": "text-red-400",
-                      "Fine Issued": "text-orange-400",
-                      "Fine Removed": "text-green-400",
+                      "Role Changed": "text-amber-600",
+                      "Level Assigned": "text-blue-600",
+                      "Dept Assigned": "text-cyan-600",
+                      "User Deleted": "text-red-500",
+                      "Fine Issued": "text-orange-500",
+                      "Fine Removed": "text-green-600",
                     };
-                    const color = actionColor[entry.action] ?? "text-purple-300";
+                    const color = actionColor[entry.action] ?? "text-purple-500";
                     return (
                       <div
                         key={entry.id}
                         className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg hover:bg-purple-900/30 transition-colors group"
                       >
                         <span className={`font-bold shrink-0 mt-0.5 ${color}`}>[{entry.action.split(" ")[0]}]</span>
-                        <span className="text-white/70 flex-1 leading-snug">{entry.details}</span>
+                        <span className="flex-1 leading-snug" style={{ color: "var(--text-bright)" }}>{entry.details}</span>
                         <div className="text-right shrink-0 leading-snug">
-                          <p className="text-purple-300/25" dir="ltr">{dateStr}<br />{timeStr}</p>
-                          <p className="text-purple-300/20 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5">
+                          <p style={{ color: "var(--text-muted)" }} dir="ltr">{dateStr}<br />{timeStr}</p>
+                          <p className="opacity-0 group-hover:opacity-100 transition-opacity mt-0.5" style={{ color: "var(--text-muted)" }}>
                             {entry.performedBy}
                           </p>
                         </div>

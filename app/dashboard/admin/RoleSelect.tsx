@@ -3,11 +3,11 @@
 import { useRef, useState } from "react";
 
 const ALL_ROLES = [
-  { value: "student",  label: "طالب",  color: "border-purple-500/50 text-purple-300 bg-purple-900/40" },
-  { value: "teacher",  label: "معلم",  color: "border-amber-500/50 text-amber-400 bg-amber-500/10" },
-  { value: "graduate", label: "خريج",  color: "border-green-500/50 text-green-400 bg-green-500/10" },
-  { value: "admin",    label: "مدير",  color: "border-red-500/50 text-red-400 bg-red-500/10" },
-  { value: "dev",      label: "Dev",   color: "border-cyan-500/50 text-cyan-300 bg-cyan-900/40" },
+  { value: "student",  label: "طالب",  color: "border-purple-500/50 text-purple-600 bg-purple-500/10" },
+  { value: "teacher",  label: "معلم",  color: "border-amber-500/50 text-amber-600 bg-amber-500/10" },
+  { value: "graduate", label: "خريج",  color: "border-green-500/50 text-green-600 bg-green-500/10" },
+  { value: "admin",    label: "مدير",  color: "border-red-500/50 text-red-500 bg-red-500/10" },
+  { value: "dev",      label: "Dev",   color: "border-cyan-500/50 text-cyan-600 bg-cyan-500/10" },
 ];
 
 export function RoleSelect({
