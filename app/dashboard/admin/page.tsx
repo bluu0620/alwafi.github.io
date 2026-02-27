@@ -202,7 +202,7 @@ export default async function AdminDashboard() {
                                 const newLevel = formData.get("level") as string;
                                 await updateStudentLevel(u.id, newLevel);
                               }}
-                              className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-full px-3 pr-7 text-center focus:outline-none focus:border-amber-500/50 max-w-[120px]"
+                              className="h-7 text-xs bg-purple-900/60 border border-purple-700/40 text-purple-300 rounded-full px-3 pr-7 text-center focus:outline-none focus:border-amber-500/50 max-w-[180px]"
                             >
                               <option value="">— بدون مستوى —</option>
                               <optgroup label="قسم اللغة العربية">
