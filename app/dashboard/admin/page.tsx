@@ -125,7 +125,6 @@ export default async function AdminDashboard() {
                   const role = (u.unsafeMetadata?.role as string) || "none";
                   const level = (u.unsafeMetadata?.level as string) || "";
                   const levelData = level ? LEVELS[level] : null;
-                  const department = (u.unsafeMetadata?.department as string) || "";
                   const initials =
                     ((u.firstName?.[0] || "") + (u.lastName?.[0] || "")) ||
                     u.emailAddresses[0]?.emailAddress?.[0]?.toUpperCase() ||

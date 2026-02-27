@@ -8,7 +8,6 @@ import {
   ACADEMIC_CALENDAR,
   EVENT_TYPE_STYLES,
   PROGRAM_INFO,
-  type CalendarEvent,
 } from "@/lib/program-data";
 
 const SAMPLE_ANNOUNCEMENTS = [
