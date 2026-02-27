@@ -27,32 +27,10 @@ export const metadata: Metadata = {
   description: "برنامج الوافي للطلاب والمعلمين - الجدول الدراسي والدرجات والمواد",
 };
 
-// Clerk appearance variables keyed by theme + mode
-const CLERK_VARS: Record<ThemeName, Record<ThemeMode, Record<string, string>>> = {
-  library: {
-    dark:  { colorPrimary: "#4F81C7", colorBackground: "#252A32", colorInputBackground: "#2E3440", colorText: "#E6E1D9", colorTextSecondary: "#A8A29A", colorNeutral: "#A8A29A" },
-    light: { colorPrimary: "#1E3A5F", colorBackground: "#EDE8DF", colorInputBackground: "#DDD6C8", colorText: "#1A1512", colorTextSecondary: "#7A7265", colorNeutral: "#3A3530" },
-  },
-  science: {
-    dark:  { colorPrimary: "#2EC4B6", colorBackground: "#1F2C36", colorInputBackground: "#263845", colorText: "#DFF6F0", colorTextSecondary: "#90A8B0", colorNeutral: "#90A8B0" },
-    light: { colorPrimary: "#006D77", colorBackground: "#E8F5F4", colorInputBackground: "#D5EDEC", colorText: "#0D2B2E", colorTextSecondary: "#5A8A8F", colorNeutral: "#2A5A5F" },
-  },
-  campus: {
-    dark:  { colorPrimary: "#84A98C", colorBackground: "#1F2520", colorInputBackground: "#272E28", colorText: "#D5E8D8", colorTextSecondary: "#8AAB8E", colorNeutral: "#8AAB8E" },
-    light: { colorPrimary: "#2F3E46", colorBackground: "#EAF0E8", colorInputBackground: "#D8E5D5", colorText: "#141E20", colorTextSecondary: "#527558", colorNeutral: "#3A5040" },
-  },
-  authority: {
-    dark:  { colorPrimary: "#B08968", colorBackground: "#241F1A", colorInputBackground: "#2D2620", colorText: "#EDE0D4", colorTextSecondary: "#A08070", colorNeutral: "#A08070" },
-    light: { colorPrimary: "#5E3023", colorBackground: "#F2EBE4", colorInputBackground: "#E5D9CF", colorText: "#1A0A05", colorTextSecondary: "#80503A", colorNeutral: "#5E3A25" },
-  },
-  stem: {
-    dark:  { colorPrimary: "#5BC0BE", colorBackground: "#1A2236", colorInputBackground: "#212D45", colorText: "#D8EEF0", colorTextSecondary: "#8AB0B8", colorNeutral: "#8AB0B8" },
-    light: { colorPrimary: "#003049", colorBackground: "#E6EEF2", colorInputBackground: "#D0DFE8", colorText: "#001018", colorTextSecondary: "#3A6888", colorNeutral: "#1A4060" },
-  },
-  mono: {
-    dark:  { colorPrimary: "#C8C8C8", colorBackground: "#252525", colorInputBackground: "#333333", colorText: "#F0F0F0", colorTextSecondary: "#B0B0B0", colorNeutral: "#909090" },
-    light: { colorPrimary: "#303030", colorBackground: "#E8E8E8", colorInputBackground: "#D5D5D5", colorText: "#1A1A1A", colorTextSecondary: "#606060", colorNeutral: "#585858" },
-  },
+// Clerk appearance variables — dark/light only, independent of color palette
+const CLERK_VARS: Record<ThemeMode, Record<string, string>> = {
+  dark:  { colorPrimary: "#C8A84B", colorBackground: "#1C1C1C", colorInputBackground: "#2A2A2A", colorText: "#F0F0F0", colorTextSecondary: "#A0A0A0", colorNeutral: "#888888" },
+  light: { colorPrimary: "#8A6800", colorBackground: "#F5F5F5", colorInputBackground: "#E8E8E8", colorText: "#1A1A1A", colorTextSecondary: "#606060", colorNeutral: "#585858" },
 };
 
 export default async function RootLayout({
@@ -64,7 +42,7 @@ export default async function RootLayout({
   const initialTheme = (cookieStore.get("wafi-theme")?.value ?? "mono") as ThemeName;
   const initialMode = (cookieStore.get("wafi-mode")?.value ?? "dark") as ThemeMode;
 
-  const clerkVars = CLERK_VARS[initialTheme]?.[initialMode] ?? CLERK_VARS.mono.dark;
+  const clerkVars = CLERK_VARS[initialMode] ?? CLERK_VARS.dark;
 
   return (
     <ClerkProvider
@@ -81,7 +59,7 @@ export default async function RootLayout({
           borderRadius: "0.75rem",
         },
         elements: {
-          card: "shadow-2xl border border-[rgba(255,255,255,0.06)]",
+          card: "shadow-2xl",
           formButtonPrimary: "font-bold transition hover:opacity-90",
           socialButtonsBlockButton: "border transition hover:opacity-80",
           formFieldInput: "transition focus:outline-none",
